@@ -3,7 +3,8 @@ webhookUri = "__uri___";
 apiToken = "x51w2DbNhw3M17KtqDXoe1li";
 slack = new Slack(apiToken);
 
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var bodyParser = require('body-parser');
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 var appRouter = function (app) {
     var request = require('request');
