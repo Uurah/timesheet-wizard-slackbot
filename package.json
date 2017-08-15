@@ -1,0 +1,15 @@
+{
+  "name": "timesheet-wizard",
+  "version": "1.0.0",
+  "description": "Slack App to add timesheets in venditionOne",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository" :
+  { "type" : "git"
+  , "url" : "https://git.heroku.com/quiet-hollows-84294.git"
+  }
+  "author": "Nic Mann",
+  "license": "ISC"
+}
