@@ -6,10 +6,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository" :
-  { "type" : "git"
-  , "url" : "https://git.heroku.com/quiet-hollows-84294.git"
-  }
+  "repository": {
+    "type": "git",
+    "url": "https://git.heroku.com/quiet-hollows-84294.git"
+  },
+  "engines": {
+    "node": "7.4.0"
+  },
   "author": "Nic Mann",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "slack-node": "^0.1.8"
+  }
 }
