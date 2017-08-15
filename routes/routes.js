@@ -1,10 +1,9 @@
 var Slack = require('slack-node');
-
 webhookUri = "__uri___";
-
 apiToken = "x51w2DbNhw3M17KtqDXoe1li";
-
 slack = new Slack(apiToken);
+
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 var appRouter = function (app) {
     var request = require('request');
@@ -60,7 +59,7 @@ var appRouter = function (app) {
             return false;
         }
     }
-    app.post('/timesheet', function (req, res) {
+    app.post('/timesheet', urlencodedParser, function (req, res) {
         request({
             baseUrl: instanceURL,
             method: 'POST',
