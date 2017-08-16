@@ -94,11 +94,11 @@ var appRouter = function (app) {
         var actionJSON = JSON.stringify(eval("(" + req.body.payload + ")"));
         console.log("Actions: " + actionJSON);
 
-        var action = req.body.payload.actions.name;
-        var user_id = req.body.payload.actions.user.id;
-        var user_name = req.body.payload.actions.user.name;
-        var selected_value = req.body.payload.actions.selected_options.value;
-        var callback = req.body.payload.actions.callback_id;
+        var action = actionJSON.actions.name;
+        var user_id = actionJSON.actions.user.id;
+        var user_name = actionJSON.actions.user.name;
+        var selected_value = actionJSON.actions.selected_options.value;
+        var callback = actionJSON.actions.callback_id;
 
         console.log('Action: ' + action);
         console.log('User ID: ' + user_id);
