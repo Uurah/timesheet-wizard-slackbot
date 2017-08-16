@@ -90,7 +90,7 @@ var appRouter = function (app) {
     app.post('/action', urlencodedParser, function (req, res) {
         console.log('Request: ' + req);
         console.log("Request Body: " + req.body);
-        /*
+
         var action = req.body.payload.actions.name;
         var user_id = req.body.payload.actions.user.id;
         var user_name = req.body.payload.actions.user.name;
@@ -102,7 +102,6 @@ var appRouter = function (app) {
         console.log('User Name: ' + user_name);
         console.log('Selected Value: ' + selected_value);
         console.log('Callback: ' + callback);
-        */
 
         request({
             baseUrl: instanceURL,
