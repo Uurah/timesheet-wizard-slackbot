@@ -5,7 +5,7 @@ slack = new Slack(apiToken);
 
 var bodyParser = require('body-parser');
 
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var urlencodedParser = bodyParser.urlencoded({extended: false})
 
 var appRouter = function (app) {
     var request = require('request');
@@ -26,30 +26,32 @@ var appRouter = function (app) {
     var apiURI = '/api/x_esg_vendition_e/slack';
     var encoded = new Buffer('api:apit3st!').toString('base64');
 
-    function encrypt(text, res, body){
-        var cipher = crypto.createCipher(algorithm,password);
-        var crypted = cipher.update(text,'utf8','hex');
+    function encrypt(text, res, body) {
+        var cipher = crypto.createCipher(algorithm, password);
+        var crypted = cipher.update(text, 'utf8', 'hex');
         crypted += cipher.final('hex');
-        function storeSession (key, text) {
+
+        function storeSession(key, text) {
             body = [sessionID, key];
-            sessionStore[sessionID] = { "key": key, "text": text, "timeout": null};
+            sessionStore[sessionID] = {"key": key, "text": text, "timeout": null};
             console.log("storeSession ID: " + sessionID);
             console.log("storeSession KEY: " + sessionStore[sessionID].key);
             console.log("storeSession TEXT: " + sessionStore[sessionID].text);
             sessionID += 1;
             return res.status(200).send(body);
         }
+
         storeSession(crypted, text);
     }
 
-    function decrypt(text){
-        var decipher = crypto.createDecipher(algorithm,password);
-        var dec = decipher.update(text,'hex','utf8');
+    function decrypt(text) {
+        var decipher = crypto.createDecipher(algorithm, password);
+        var dec = decipher.update(text, 'hex', 'utf8');
         dec += decipher.final('utf8');
         return dec;
     }
 
-    function checkSession(id, key){
+    function checkSession(id, key) {
         console.log("CHECKSESSION ID: " + id);
         console.log("CHECKSESSION KEY: " + sessionStore[id].text);
         console.log("DECRYPT: " + decrypt(key));
@@ -61,6 +63,7 @@ var appRouter = function (app) {
             return false;
         }
     }
+
     app.post('/timesheet', urlencodedParser, function (req, res) {
         request({
             baseUrl: instanceURL,
@@ -85,6 +88,18 @@ var appRouter = function (app) {
     });
 
     app.post('/action', urlencodedParser, function (req, res) {
+        var action = req.payload.actions.name;
+        var user_id = req.payload.actions.user.id;
+        var user_name = req.payload.actions.user.name;
+        var selected_value = req.payload.actions.selected_options.value;
+        var callback = req.payload.actions.callback_id;
+
+        console.log('Action: ' + action);
+        console.log('User ID: ' + user_id);
+        console.log('User Name: ' + user_name);
+        console.log('Selected Value: ' + selected_value);
+        console.log('Callback: ' + callback);
+        
         request({
             baseUrl: instanceURL,
             method: 'POST',
@@ -132,3 +147,11 @@ var appRouter = function (app) {
 };
 
 module.exports = appRouter;
+
+{
+    "payload":
+    {
+        "actions"
+    }:[
+        {"name": "engagement_list\",\"type\":\"select\",\"selected_options\":[{\"value\":\"f41beda5dbbfb60008ae7c4daf9619f3\"}]}],\"callback_id\":\"timesheet_submit\",\"team\":{\"id\":\"T402MJHAA\",\"domain\":\"esolutionsone\"},\"channel\":{\"id\":\"D41KQUBJQ\",\"name\":\"directmessage\"},\"user\":{\"id\":\"U41FDUPJP\",\"name\":\"nic\"},\"action_ts\":\"1502915994.115333\",\"message_ts\":\"1502915991.000302\",\"attachment_id\":\"1\",\"token\":\"x51w2DbNhw3M17KtqDXoe1li\",\"is_app_unfurl\":false,\"response_url\":\"https:\\/\\/hooks.slack.com\\/actions\\/T402MJHAA\\/226978574720\\/nYbJowZvfsCQ0o7aKWbXoBeC\",\"trigger_id\":\"227763801077.136089629350.768703a02964401338020ef1db2e6119\"}"
+}
