@@ -92,7 +92,7 @@ var appRouter = function (app) {
         console.log("Request Payload: " + JSON.stringify(req.body.payload));
         //var actionJSON = req.body.payload.actions;
         var actionJSON = JSON.stringify(eval("(" + req.body.payload + ")"));
-        console.log("Actions: " + actionJSON);
+        console.log("Actions: " + actionJSON.actions);
 
         var action = actionJSON.actions.name;
         var user_id = actionJSON.actions.user.id;
