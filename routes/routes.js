@@ -104,10 +104,10 @@ var appRouter = function (app) {
         //var user_name = actionJSON.user.name;
         var callback = actionJSON.callback_id;
 
-        console.log('Action: ' + action);
-        console.log('User ID: ' + user_id);
-        console.log('User Name: ' + user_name);
-        console.log('Selected Value: ' + selected_value);
+        //console.log('Action: ' + action);
+        //console.log('User ID: ' + user_id);
+        //console.log('User Name: ' + user_name);
+        //console.log('Selected Value: ' + selected_value);
         console.log('Callback: ' + callback);
 
         request({
