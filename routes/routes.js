@@ -94,7 +94,7 @@ var appRouter = function (app) {
         var actionJSON = JSON.parse(json);
         //console.log("Actions: " + actionJSON);
 
-        console.log("Action Array: " + actionJSON.actions.toString());
+        console.log("Action Array: " + JSON.stringify(actionJSON.actions));
         //var action = actionJSON.actions.name;
         //if (actionJSON.actions.type === "select") {
             //var selected_value = actionJSON.actions.selected_options.value;
