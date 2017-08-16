@@ -94,12 +94,13 @@ var appRouter = function (app) {
         var actionJSON = JSON.stringify(eval("(" + req.body.payload + ")"));
         console.log("Actions: " + actionJSON);
 
+        /*
         var action = actionJSON.actions.name;
         if (actionJSON.actions.type === "select") {
             var selected_value = actionJSON.actions.selected_options.value;
-        }
-        var user_id = actionJSON.user.id;
-        var user_name = actionJSON.user.name;
+        }*/
+        //var user_id = actionJSON.user.id;
+        //var user_name = actionJSON.user.name;
         var callback = actionJSON.callback_id;
 
         console.log('Action: ' + action);
