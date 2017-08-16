@@ -91,8 +91,8 @@ var appRouter = function (app) {
         //console.log('Request: ' + req);
         //console.log("Request Payload: " + JSON.stringify(req.body.payload));
         //var actionJSON = req.body.payload.actions;
-        var actionJSON = JSON.stringify(eval("(" + req.body.payload + ")"));
-        actionJSON = JSON.parse(actionJSON);
+        var json = JSON.stringify(eval("(" + req.body.payload + ")"));
+        var actionJSON = JSON.parse(json);
         console.log("Actions: " + actionJSON);
 
         /*
