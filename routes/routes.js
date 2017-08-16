@@ -94,18 +94,19 @@ var appRouter = function (app) {
         var actionJSON = JSON.parse(json);
         //console.log("Actions: " + actionJSON);
 
-        var action = actionJSON.actions.name;
-        if (actionJSON.actions.type === "select") {
-            var selected_value = actionJSON.actions.selected_options.value;
-        }
+        console.log("Action Array: " + actionJSON.actions);
+        //var action = actionJSON.actions.name;
+        //if (actionJSON.actions.type === "select") {
+            //var selected_value = actionJSON.actions.selected_options.value;
+        //}
         var user_id = actionJSON.user.id;
         var user_name = actionJSON.user.name;
         var callback = actionJSON.callback_id;
 
-        console.log('Action: ' + action);
+        //console.log('Action: ' + action);
         console.log('User ID: ' + user_id);
         console.log('User Name: ' + user_name);
-        console.log('Selected Value: ' + selected_value);
+        //console.log('Selected Value: ' + selected_value);
         console.log('Callback: ' + callback);
 
         request({
