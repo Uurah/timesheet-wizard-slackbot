@@ -90,6 +90,7 @@ var appRouter = function (app) {
     app.post('/action', urlencodedParser, function (req, res) {
         var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         var actionJSON = JSON.parse(json);
+        console.log("Action JSON: " + JSON.stringify(actionJSON));
 
         if (actionJSON.token === apiToken) {
             if (actionJSON.actions[0].name === 'engagement_list') {
