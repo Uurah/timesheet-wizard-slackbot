@@ -84,7 +84,7 @@ var appRouter = function (app) {
         });
     });
 
-    app.post('/action', function (req, res) {
+    app.post('/action', urlencodedParser, function (req, res) {
         request({
             baseUrl: instanceURL,
             method: 'POST',
@@ -107,7 +107,7 @@ var appRouter = function (app) {
         });
     });
 
-    app.post('/options_load', function (req, res) {
+    app.post('/options_load', urlencodedParser, function (req, res) {
         request({
             baseUrl: instanceURL,
             method: 'POST',
