@@ -89,9 +89,10 @@ var appRouter = function (app) {
 
     app.post('/action', urlencodedParser, function (req, res) {
         console.log('Request: ' + req);
-        console.log("Request Body: " + JSON.stringify(req.body.payload.actions));
-        var actionJSON = req.body.payload.actions;
-        console.log("Actions: " + JSON.stringify(actionJSON));
+        console.log("Request Payload: " + JSON.stringify(req.body.payload));
+        //var actionJSON = req.body.payload.actions;
+        var actionJSON = JSON.stringify(eval("(" + req.body.payload + ")"));
+        console.log("Actions: " + actionJSON);
 
         var action = req.body.payload.actions.name;
         var user_id = req.body.payload.actions.user.id;
