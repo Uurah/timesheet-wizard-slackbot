@@ -88,17 +88,19 @@ var appRouter = function (app) {
     });
 
     app.post('/action', urlencodedParser, function (req, res) {
-        console.log('Request: ' + req);
-        console.log("Request Payload: " + JSON.stringify(req.body.payload));
+        //console.log('Request: ' + req);
+        //console.log("Request Payload: " + JSON.stringify(req.body.payload));
         //var actionJSON = req.body.payload.actions;
         var actionJSON = JSON.stringify(eval("(" + req.body.payload + ")"));
-        console.log("Actions: " + actionJSON.actions);
+        console.log("Actions: " + actionJSON);
 
         var action = actionJSON.actions.name;
-        var user_id = actionJSON.actions.user.id;
-        var user_name = actionJSON.actions.user.name;
-        var selected_value = actionJSON.actions.selected_options.value;
-        var callback = actionJSON.actions.callback_id;
+        if (actionJSON.actions.type === "select") {
+            var selected_value = actionJSON.actions.selected_options.value;
+        }
+        var user_id = actionJSON.user.id;
+        var user_name = actionJSON.user.name;
+        var callback = actionJSON.callback_id;
 
         console.log('Action: ' + action);
         console.log('User ID: ' + user_id);
