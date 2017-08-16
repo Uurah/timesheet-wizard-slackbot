@@ -1,7 +1,7 @@
 var Slack = require('slack-node');
-webhookUri = "__uri___";
-apiToken = "x51w2DbNhw3M17KtqDXoe1li";
-slack = new Slack(apiToken);
+var webhookUri = "__uri___";
+var apiToken = "x51w2DbNhw3M17KtqDXoe1li";
+var slack = new Slack(apiToken);
 
 var bodyParser = require('body-parser');
 
@@ -88,47 +88,54 @@ var appRouter = function (app) {
     });
 
     app.post('/action', urlencodedParser, function (req, res) {
-        //console.log('Request: ' + req);
-        //console.log("Request Payload: " + JSON.stringify(req.body.payload));
         var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         var actionJSON = JSON.parse(json);
-        //console.log("Actions: " + actionJSON);
 
-        //console.log("Action Array: " + JSON.stringify(actionJSON.actions[0].name));
-        var action = actionJSON.actions[0].name;
-        if (actionJSON.actions[0].type === "select") {
-            var selected_value = actionJSON.actions[0].selected_options[0].value;
+        if (actionJSON.token === apiToken) {
+            if (actionJSON.actions[0].name === 'engagement_list') {
+                var action = actionJSON.actions[0].name;
+                if (actionJSON.actions[0].type === "select") {
+                    var selected_value = actionJSON.actions[0].selected_options[0].value;
+                }
+                var user_id = actionJSON.user.id;
+                var user_name = actionJSON.user.name;
+                var callback = actionJSON.callback_id;
+
+                console.log('Action: ' + action);
+                console.log('User ID: ' + user_id);
+                console.log('User Name: ' + user_name);
+                console.log('Selected Value: ' + selected_value);
+                console.log('Callback: ' + callback);
+            }
+            var snJSON = {
+                'selected': selected_value,
+                'user_id': user_id,
+                'user_name': user_name
+            };
+
+            request({
+                baseUrl: instanceURL,
+                method: 'POST',
+                uri: apiURI + '/' + callback,
+                json: true,
+                body: snJSON,
+                headers: {
+                    'Authorization': 'basic ' + encoded,
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }, function (err, response, body) {
+                if (!err && response.statusCode === 200) {
+                    console.log("SUCCESS: " + body);
+                    return res.status(200).send(body);
+                } else {
+                    console.log("ERROR: " + body);
+                    return res.status(418).send(body);
+                }
+            });
+        } else {
+            console.log("Token from Slack did not match expected token");
         }
-        var user_id = actionJSON.user.id;
-        var user_name = actionJSON.user.name;
-        var callback = actionJSON.callback_id;
-
-        console.log('Action: ' + action);
-        console.log('User ID: ' + user_id);
-        console.log('User Name: ' + user_name);
-        console.log('Selected Value: ' + selected_value);
-        console.log('Callback: ' + callback);
-
-        request({
-            baseUrl: instanceURL,
-            method: 'POST',
-            uri: apiURI + '/action',
-            json: true,
-            body: req.body,
-            headers: {
-                'Authorization': 'basic ' + encoded,
-                'accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }, function (err, response, body) {
-            if (!err && response.statusCode === 200) {
-                console.log("SUCCESS: " + body);
-                return res.status(200).send(body);
-            } else {
-                console.log("ERROR: " + body);
-                return res.status(418).send(body);
-            }
-        });
     });
 
     app.post('/options_load', urlencodedParser, function (req, res) {
