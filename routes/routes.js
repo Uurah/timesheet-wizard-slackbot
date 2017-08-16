@@ -88,18 +88,18 @@ var appRouter = function (app) {
     });
 
     app.post('/action', urlencodedParser, function (req, res) {
-        var action = req.payload.actions.name;
-        var user_id = req.payload.actions.user.id;
-        var user_name = req.payload.actions.user.name;
-        var selected_value = req.payload.actions.selected_options.value;
-        var callback = req.payload.actions.callback_id;
+        var action = req.body.payload.actions.name;
+        var user_id = req.body.payload.actions.user.id;
+        var user_name = req.body.payload.actions.user.name;
+        var selected_value = req.body.payload.actions.selected_options.value;
+        var callback = req.body.payload.actions.callback_id;
 
         console.log('Action: ' + action);
         console.log('User ID: ' + user_id);
         console.log('User Name: ' + user_name);
         console.log('Selected Value: ' + selected_value);
         console.log('Callback: ' + callback);
-        
+
         request({
             baseUrl: instanceURL,
             method: 'POST',
