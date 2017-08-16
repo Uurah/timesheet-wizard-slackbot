@@ -5,11 +5,7 @@ slack = new Slack(apiToken);
 
 var bodyParser = require('body-parser');
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
-app.use(bodyParser.json());
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 var appRouter = function (app) {
     var request = require('request');
@@ -65,7 +61,7 @@ var appRouter = function (app) {
             return false;
         }
     }
-    app.post('/timesheet', function (req, res) {
+    app.post('/timesheet', urlencodedParser, function (req, res) {
         request({
             baseUrl: instanceURL,
             method: 'POST',
