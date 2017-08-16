@@ -90,6 +90,7 @@ var appRouter = function (app) {
     app.post('/action', urlencodedParser, function (req, res) {
         console.log('Request: ' + req);
         console.log("Request Body: " + req.body);
+        /*
         var action = req.body.payload.actions.name;
         var user_id = req.body.payload.actions.user.id;
         var user_name = req.body.payload.actions.user.name;
@@ -101,6 +102,7 @@ var appRouter = function (app) {
         console.log('User Name: ' + user_name);
         console.log('Selected Value: ' + selected_value);
         console.log('Callback: ' + callback);
+        */
 
         request({
             baseUrl: instanceURL,
@@ -149,11 +151,3 @@ var appRouter = function (app) {
 };
 
 module.exports = appRouter;
-
-{
-    "payload":
-    {
-        "actions"
-    }:[
-        {"name": "engagement_list\",\"type\":\"select\",\"selected_options\":[{\"value\":\"f41beda5dbbfb60008ae7c4daf9619f3\"}]}],\"callback_id\":\"timesheet_submit\",\"team\":{\"id\":\"T402MJHAA\",\"domain\":\"esolutionsone\"},\"channel\":{\"id\":\"D41KQUBJQ\",\"name\":\"directmessage\"},\"user\":{\"id\":\"U41FDUPJP\",\"name\":\"nic\"},\"action_ts\":\"1502915994.115333\",\"message_ts\":\"1502915991.000302\",\"attachment_id\":\"1\",\"token\":\"x51w2DbNhw3M17KtqDXoe1li\",\"is_app_unfurl\":false,\"response_url\":\"https:\\/\\/hooks.slack.com\\/actions\\/T402MJHAA\\/226978574720\\/nYbJowZvfsCQ0o7aKWbXoBeC\",\"trigger_id\":\"227763801077.136089629350.768703a02964401338020ef1db2e6119\"}"
-}
