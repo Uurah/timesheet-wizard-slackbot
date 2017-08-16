@@ -88,7 +88,7 @@ var appRouter = function (app) {
         request({
             baseUrl: instanceURL,
             method: 'POST',
-            uri: apiURI + '/timesheet',
+            uri: apiURI + '/action',
             json: true,
             body: req.body,
             headers: {
@@ -111,7 +111,7 @@ var appRouter = function (app) {
         request({
             baseUrl: instanceURL,
             method: 'POST',
-            uri: apiURI + '/timesheet',
+            uri: apiURI + '/options_load',
             json: true,
             body: req.body,
             headers: {
