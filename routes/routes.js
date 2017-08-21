@@ -58,7 +58,7 @@ var appRouter = function (app) {
         if (actionJSON.token === apiToken) {
             var user_id = actionJSON.user.id;
             var action = actionJSON.actions[0].name;
-            var callback_id = parseFloat(actionJSON.actions[0].callback_id);
+            var callback_id = actionJSON.actions[0].callback_id;
             if (action === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
                     var engagement = actionJSON.actions[0].selected_options[0].value;
