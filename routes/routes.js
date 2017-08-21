@@ -66,102 +66,106 @@ var appRouter = function (app) {
 
     app.post('/timesheet', urlencodedParser, function (req, res) {
         console.log("Req: " + req.body.token);
-        var json = {
-            "text": "You have summoned the Timesheet Wizard!",
-            "attachments": [
-                {
-                    "text": "Pick your engagement and time worked against it mortal!",
-                    "fallback": "My magic is failing today...",
-                    "callback_id": "engagement_selected",
-                    "color": "#3AA3E3",
-                    "attachment_type": "default",
-                    "actions": [
-                        {
-                            "name": "engagement_list",
-                            "text": "Choose your engagement!",
-                            "type": "select",
-                            "confirm": {
-                                "title": "Are you sure?",
-                                "text": "",
-                                "ok_text": "Yes",
-                                "dismiss_text": "No"
+        if (req.body.token === apiToken) {
+            var json = {
+                "text": "You have summoned the Timesheet Wizard!",
+                "attachments": [
+                    {
+                        "text": "Pick your engagement and time worked against it mortal!",
+                        "fallback": "My magic is failing today...",
+                        "callback_id": "engagement_selected",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default",
+                        "actions": [
+                            {
+                                "name": "engagement_list",
+                                "text": "Choose your engagement!",
+                                "type": "select",
+                                "confirm": {
+                                    "title": "Are you sure?",
+                                    "text": "",
+                                    "ok_text": "Yes",
+                                    "dismiss_text": "No"
+                                },
+                                "data_source": "external",
                             },
-                            "data_source": "external",
-                        },
-                        {
-                            "name": "hours",
-                            "text": "Hours",
-                            "type": "select",
-                            "options": [
-                                {
-                                    "text": "1 Hour",
-                                    "value": 1
-                                },
-                                {
-                                    "text": "2 Hours",
-                                    "value": 2
-                                },
-                                {
-                                    "text": "3 Hours",
-                                    "value": 3
-                                },
-                                {
-                                    "text": "4 Hours",
-                                    "value": 4
-                                },
-                                {
-                                    "text": "5 Hours",
-                                    "value": 5
-                                },
-                                {
-                                    "text": "6 Hours",
-                                    "value": 6
-                                },
-                                {
-                                    "text": "7 Hours",
-                                    "value": 7
-                                },
-                                {
-                                    "text": "8 Hours",
-                                    "value": 8
-                                }
-                            ]
-                        },
-                        {
-                            "name": "minutes",
-                            "text": "Minutes",
-                            "type": "select",
-                            "confirm": {
-                                "title": "Are you sure?",
-                                "text": "",
-                                "ok_text": "Yes",
-                                "dismiss_text": "No"
+                            {
+                                "name": "hours",
+                                "text": "Hours",
+                                "type": "select",
+                                "options": [
+                                    {
+                                        "text": "1 Hour",
+                                        "value": 1
+                                    },
+                                    {
+                                        "text": "2 Hours",
+                                        "value": 2
+                                    },
+                                    {
+                                        "text": "3 Hours",
+                                        "value": 3
+                                    },
+                                    {
+                                        "text": "4 Hours",
+                                        "value": 4
+                                    },
+                                    {
+                                        "text": "5 Hours",
+                                        "value": 5
+                                    },
+                                    {
+                                        "text": "6 Hours",
+                                        "value": 6
+                                    },
+                                    {
+                                        "text": "7 Hours",
+                                        "value": 7
+                                    },
+                                    {
+                                        "text": "8 Hours",
+                                        "value": 8
+                                    }
+                                ]
                             },
-                            "options": [
-                                {
-                                    "text": "0 Minutes",
-                                    "value": 0
+                            {
+                                "name": "minutes",
+                                "text": "Minutes",
+                                "type": "select",
+                                "confirm": {
+                                    "title": "Are you sure?",
+                                    "text": "",
+                                    "ok_text": "Yes",
+                                    "dismiss_text": "No"
                                 },
-                                {
-                                    "text": "15 Minutes",
-                                    "value": 15
-                                },
-                                {
-                                    "text": "30 Minutes",
-                                    "value": 30
-                                },
-                                {
-                                    "text": "45 Minutes",
-                                    "value": 45
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-        res.contentType('application/json');
-        res.status(200).send(json);
+                                "options": [
+                                    {
+                                        "text": "0 Minutes",
+                                        "value": 0
+                                    },
+                                    {
+                                        "text": "15 Minutes",
+                                        "value": 15
+                                    },
+                                    {
+                                        "text": "30 Minutes",
+                                        "value": 30
+                                    },
+                                    {
+                                        "text": "45 Minutes",
+                                        "value": 45
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            };
+            res.contentType('application/json');
+            res.status(200).send(json);
+        } else {
+            res.status(401).send("Token does not match expected");
+        }
     });
 
     app.post('/action', urlencodedParser, function (req, res) {
