@@ -74,6 +74,9 @@ var appRouter = function (app) {
                     };
 
                     console.log("snJSON: " + JSON.stringify(snJSON));
+                    console.log("snJSON User ID: " + snJSON.user_id);
+                    console.log("snJSON Engagement: " + snJSON.engagement);
+                    console.log("snJSON Time Worked: " + snJSON.time_worked);
                 }
             }
 
