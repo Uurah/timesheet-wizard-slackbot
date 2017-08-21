@@ -68,7 +68,7 @@ var appRouter = function (app) {
                     console.log('Callback ID: ' + callback_id);
 
                     var snJSON = {
-                        "engagement'": engagement.toString(),
+                        "engagement": engagement.toString(),
                         "user_id": user_id.toString(),
                         "time_worked": callback_id.toString()
                     };
