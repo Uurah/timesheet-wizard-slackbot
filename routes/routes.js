@@ -160,7 +160,7 @@ var appRouter = function (app) {
             ]
         };
         res.contentType('application/json');
-        res.statusCode(200);
+        res.status(200);
         res.body(json);
         res.send();
     });
