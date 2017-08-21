@@ -72,6 +72,8 @@ var appRouter = function (app) {
                         "user_id": user_id,
                         "time_worked": callback_id
                     };
+
+                    console.log("snJSON: " + snJSON.stringify());
                 }
             }
 
