@@ -65,6 +65,7 @@ var appRouter = function (app) {
     }
 
     app.post('/timesheet', urlencodedParser, function (req, res) {
+        console.log("Req: " + req.body);
         var json = {
             "text": "You have summoned the Timesheet Wizard!",
             "attachments": [
