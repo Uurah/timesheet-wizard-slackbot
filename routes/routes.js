@@ -159,7 +159,10 @@ var appRouter = function (app) {
                 }
             ]
         };
-        res.statusCode(200).send(json);
+        res.contentType('application/json');
+        res.statusCode(200);
+        res.body(json);
+        res.send();
     });
 
     app.post('/action', urlencodedParser, function (req, res) {
