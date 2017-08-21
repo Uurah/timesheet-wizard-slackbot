@@ -139,7 +139,7 @@ var appRouter = function (app) {
         }
     });
 
-    app.post('/options_load', urlencodedParser, function (req, res) {
+    app.post('/options_load', function (req, res) {
         var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         var actionJSON = JSON.parse(json);
         console.log("Action JSON: " + JSON.stringify(actionJSON));
@@ -160,8 +160,8 @@ var appRouter = function (app) {
                     console.log("SUCCESS: " + body);
                     return res.status(200).send(body);
                 } else {
-                    console.log("ERROR: " + body);
-                    return res.status(418).send(body);
+                    console.log("ERROR: " + err);
+                    return res.status(418).send(err);
                 }
             });
         }
