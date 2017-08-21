@@ -140,26 +140,31 @@ var appRouter = function (app) {
     });
 
     app.post('/options_load', urlencodedParser, function (req, res) {
-        request({
-            baseUrl: instanceURL,
-            method: 'POST',
-            uri: apiURI + '/options_load',
-            json: true,
-            body: req.body,
-            headers: {
-                'Authorization': 'basic ' + encoded,
-                'accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }, function (err, response, body) {
-            if (!err && response.statusCode === 200) {
-                console.log("SUCCESS: " + body);
-                return res.status(200).send(body);
-            } else {
-                console.log("ERROR: " + body);
-                return res.status(418).send(body);
-            }
-        });
+        var json = JSON.stringify(eval("(" + req.body.payload + ")"));
+        var actionJSON = JSON.parse(json);
+        console.log("Action JSON: " + JSON.stringify(actionJSON));
+        if (actionJSON.token === apiToken) {
+            request({
+                baseUrl: instanceURL,
+                method: 'POST',
+                uri: apiURI + '/options_load',
+                json: true,
+                body: actionJSON,
+                headers: {
+                    'Authorization': 'basic ' + encoded,
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }, function (err, response, body) {
+                if (!err && response.statusCode === 200) {
+                    console.log("SUCCESS: " + body);
+                    return res.status(200).send(body);
+                } else {
+                    console.log("ERROR: " + body);
+                    return res.status(418).send(body);
+                }
+            });
+        }
     });
 };
 
