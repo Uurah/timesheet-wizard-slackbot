@@ -5,7 +5,7 @@ var slack = new Slack(apiToken);
 
 var bodyParser = require('body-parser');
 
-var urlencodedParser = bodyParser.urlencoded({extended: false})
+var urlencodedParser = bodyParser.urlencoded({extended: false});
 
 var appRouter = function (app) {
     var request = require('request');
@@ -37,7 +37,7 @@ var appRouter = function (app) {
                                     "ok_text": "Yes",
                                     "dismiss_text": "No"
                                 },
-                                "data_source": "external",
+                                "data_source": "external"
                             }
                         ]
                     }
@@ -66,40 +66,32 @@ var appRouter = function (app) {
                     console.log('User ID: ' + user_id);
                     console.log('Engagement: ' + engagement);
                     console.log('Callback ID: ' + callback_id);
-
-                    var snJSON = {
+                }
+                request({
+                    baseUrl: instanceURL,
+                    method: 'POST',
+                    uri: apiURI + '/engagement_selected',
+                    json: true,
+                    body: {
                         "engagement": engagement.toString(),
                         "user_id": user_id.toString(),
                         "time_worked": callback_id.toString()
-                    };
-
-                    console.log("snJSON: " + JSON.stringify(snJSON));
-                    console.log("snJSON User ID: " + snJSON.user_id);
-                    console.log("snJSON Engagement: " + snJSON.engagement);
-                    console.log("snJSON Time Worked: " + snJSON.time_worked);
-                }
+                    },
+                    headers: {
+                        'Authorization': 'basic ' + encoded,
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }, function (err, response, body) {
+                    if (!err && response.statusCode === 200) {
+                        console.log("SUCCESS: " + body);
+                        return res.status(200).send(body);
+                    } else {
+                        console.log("ERROR: " + err);
+                        return res.status(418).send(err);
+                    }
+                });
             }
-
-            request({
-                baseUrl: instanceURL,
-                method: 'POST',
-                uri: apiURI + '/engagement_selected',
-                json: true,
-                body: snJSON,
-                headers: {
-                    'Authorization': 'basic ' + encoded,
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }, function (err, response, body) {
-                if (!err && response.statusCode === 200) {
-                    console.log("SUCCESS: " + body);
-                    return res.status(200).send(body);
-                } else {
-                    console.log("ERROR: " + err);
-                    return res.status(418).send(err);
-                }
-            });
         } else {
             console.log("Token from Slack did not match expected token");
         }
