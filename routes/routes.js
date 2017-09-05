@@ -93,6 +93,9 @@ var appRouter = function (app) {
                     }
                 });
             }
+            if (action === 'enter_time') {
+                console.log("Called enter time");
+            }
         } else {
             console.log("Token from Slack did not match expected token");
         }
