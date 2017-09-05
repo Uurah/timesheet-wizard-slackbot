@@ -60,6 +60,13 @@ var appRouter = function (app) {
             var user_id = actionJSON.user.id;
             var action = actionJSON.actions[0].name;
             var callback_id = actionJSON.callback_id;
+
+            var timesheetJSON = {
+                "user": user_id,
+                "engagement": '',
+                "hours": 0
+            };
+
             if (callback_id === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
                     var engagement = actionJSON.actions[0].selected_options[0].value;
@@ -100,9 +107,9 @@ var appRouter = function (app) {
                         "text": "You have summoned the Timesheet Wizard!",
                         "attachments": [
                             {
-                                "text": "Pick your engagement and time worked against it mortal!",
+                                "text": "Pick your engagement mortal!",
                                 "fallback": "My magic is failing today...",
-                                "callback_id": "engagement_list",
+                                "callback_id": "engagement_selected",
                                 "color": "#3AA3E3",
                                 "attachment_type": "default",
                                 "actions": [
@@ -110,12 +117,6 @@ var appRouter = function (app) {
                                         "name": "engagement_select",
                                         "text": "Choose your engagement!",
                                         "type": "select",
-                                        "confirm": {
-                                            "title": "Timesheet Confirmation",
-                                            "text": "Are you sure you want to submit a timesheet against this engagement for " + req.body.text + " hours?",
-                                            "ok_text": "Yes",
-                                            "dismiss_text": "No"
-                                        },
                                         "data_source": "external"
                                     }
                                 ]
@@ -124,18 +125,101 @@ var appRouter = function (app) {
                     };
                     res.contentType('application/json');
                     res.status(200).send(json);
-                } else {
-                    res.status(401).send("Token does not match expected");
-                }
                 }
                 if (action === 'no') {
                     console.log("Does not want to enter time");
                     res.status(200).send({"text": "Then begone with you!"});
                 }
             }
+            if (callback_id === 'engagement_selected') {
+                var es = {
+                    "text": "",
+                    "attachments": [
+                        {
+                            "text": "How many hours have you worked against this engagement?",
+                            "fallback": "My magic is failing today...",
+                            "callback_id": "hours_entered",
+                            "color": "#3AA3E3",
+                            "attachment_type": "default",
+                            "actions": [
+                                {
+                                    "name": "hours",
+                                    "text": "Hours",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "text": "1 Hour",
+                                            "value": 1
+                                        },
+                                        {
+                                            "text": "2 Hours",
+                                            "value": 2
+                                        },
+                                        {
+                                            "text": "3 Hours",
+                                            "value": 3
+                                        },
+                                        {
+                                            "text": "4 Hours",
+                                            "value": 4
+                                        },
+                                        {
+                                            "text": "5 Hours",
+                                            "value": 5
+                                        },
+                                        {
+                                            "text": "6 Hours",
+                                            "value": 6
+                                        },
+                                        {
+                                            "text": "7 Hours",
+                                            "value": 7
+                                        },
+                                        {
+                                            "text": "8 Hours",
+                                            "value": 8
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+                res.contentType('application/json');
+                res.status(200).send(es);
+            }
+            if (callback_id === 'hours_entered') {
+                timesheetJSON.hours = actionJSON.actions[0].selected_options[0].value;
+                timesheetJSON.engagement = engagement;
+                timesheetJSON.user = user_id;
+
+                console.log("Timeseet JSON: " + JSON.stringify(timesheetJSON));
+
+                request({
+                    baseUrl: instanceURL,
+                    method: 'POST',
+                    uri: apiURI + '/engagement_selected',
+                    json: true,
+                    body: timesheetJSON,
+                    headers: {
+                        'Authorization': 'basic ' + encoded,
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }, function (err, response, body) {
+                    if (!err && response.statusCode === 200) {
+                        console.log("SUCCESS: " + body);
+                        return res.status(200).send(body);
+                    } else {
+                        console.log("ERROR: " + err);
+                        return res.status(418).send(err);
+                    }
+                });
+            }
             else {
                 console.log("Callback_id does not match any expected");
             }
+
         } else {
             console.log("Token from Slack did not match expected token");
         }
