@@ -96,7 +96,7 @@ var appRouter = function (app) {
             if (callback_id === 'enter_time') {
                 if (action === 'yes') {
                     console.log("Wants to enter time");
-                    res.send('timesheet');
+                    res.redirect('https://quiet-hollows-84294.herokuapp.com/timesheet');
                 }
                 if (action === 'no') {
                     console.log("Does not want to enter time");
