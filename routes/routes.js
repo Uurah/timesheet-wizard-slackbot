@@ -60,6 +60,7 @@ var appRouter = function (app) {
             var user_id = actionJSON.user.id;
             var action = actionJSON.actions[0].name;
             var callback_id = actionJSON.callback_id;
+            var engagement;
 
             var timesheetJSON = {
                 "user": user_id,
@@ -69,7 +70,7 @@ var appRouter = function (app) {
 
             if (callback_id === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
-                    var engagement = actionJSON.actions[0].selected_options[0].value;
+                    engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log('Action: ' + action);
                     console.log('User ID: ' + user_id);
                     console.log('Engagement: ' + engagement);
