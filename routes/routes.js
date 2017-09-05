@@ -171,12 +171,13 @@ var appRouter = function (app) {
                 ]
             }]
         }, function(err, response){
-            if (err) {
-                console.log(err);
-                res.status(400).send(err);
-            } else if (response.statusCode === 200) {
+            console.log("Status Code: " + reponse.statusCode);
+            if (!err && response.statusCode === 200) {
                 console.log(response);
                 res.status(200).send(response.body);
+            } else {
+                console.log("Failed");
+                res.status(400).send(err);
             }
         });
 /*
