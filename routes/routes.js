@@ -129,7 +129,9 @@ var appRouter = function (app) {
         //var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         //var actionJSON = JSON.parse(json);
         //console.log("Action JSON: " + JSON.stringify(actionJSON));
-        console.log("Req Body: " + req.body.user);
+        console.log("User: " + req.body.user);
+        console.log("Engagement String: " + req.body.engagements);
+        console.log("Hour String: " + req.body.hours);
         if (req.body.token === 'xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1') {
             var json = {
                 "token": "xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1",
