@@ -1,6 +1,7 @@
 var Slack = require('slack-node');
 var webhookUri = "__uri___";
-var apiToken = "x51w2DbNhw3M17KtqDXoe1li";
+var apiToken = "xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1";
+var verificationToken = "x51w2DbNhw3M17KtqDXoe1li";
 var slack = new Slack(apiToken);
 
 var bodyParser = require('body-parser');
@@ -16,7 +17,7 @@ var appRouter = function (app) {
 
     app.post('/timesheet', urlencodedParser, function (req, res) {
         console.log("Req: " + req.body.token);
-        if (req.body.token === apiToken) {
+        if (req.body.token === verificationToken) {
             var json = {
                 "text": "You have summoned the Timesheet Wizard!",
                 "attachments": [
@@ -55,7 +56,7 @@ var appRouter = function (app) {
         var actionJSON = JSON.parse(json);
         console.log("Action JSON: " + JSON.stringify(actionJSON));
 
-        if (actionJSON.token === apiToken) {
+        if (actionJSON.token === verificationToken) {
             var user_id = actionJSON.user.id;
             var action = actionJSON.actions[0].name;
             var callback_id = actionJSON.callback_id;
@@ -101,7 +102,7 @@ var appRouter = function (app) {
         var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         var actionJSON = JSON.parse(json);
         console.log("Action JSON: " + JSON.stringify(actionJSON));
-        if (actionJSON.token === apiToken) {
+        if (actionJSON.token === verificationToken) {
             request({
                 baseUrl: instanceURL,
                 method: 'POST',
