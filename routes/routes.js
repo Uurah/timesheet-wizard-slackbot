@@ -133,43 +133,43 @@ var appRouter = function (app) {
         slack.api('chat.postMessage', {
             text:'Engagement Summary',
             channel: req.body.user,
-            attachments: [{
-                "fallback": "This attachment isn't supported.",
-                "title": "Your Daily Engagement Summary",
-                "color": "#9c4c0d",
-                "fields": [{
-                    "title": "Engagement",
-                    "value": req.body.engagements,
-                    "short": true
-                }, {
-                    "title": "Hours Worked Today",
-                    "value": req.body.hours,
-                    "short": true
-                }],
-                "mrkdwn_in": ["text", "fields"],
-                "text": ""
-            },
-            {
-                "fallback": "Cannot Display Buttons",
-                "title": "Would you like to create a timesheet for one of these engagements?",
-                "callback_id": "enter_time",
-                "color": "#3AA3E3",
-                "attachment_type": "default",
-                "actions": [
-                    {
-                        "name": "yes",
-                        "text": "Yes",
-                        "type": "button",
-                        "value": "yes"
-                    },
-                    {
-                        "name": "no",
-                        "text": "No",
-                        "type": "button",
-                        "value": "no"
-                    }
-                ]
-            }].toString()
+            attachments: encodeURIComponent(JSON.stringify([{
+                    "fallback": "This attachment isn't supported.",
+                    "title": "Your Daily Engagement Summary",
+                    "color": "#9c4c0d",
+                    "fields": [{
+                        "title": "Engagement",
+                        "value": req.body.engagements,
+                        "short": true
+                    }, {
+                        "title": "Hours Worked Today",
+                        "value": req.body.hours,
+                        "short": true
+                    }],
+                    "mrkdwn_in": ["text", "fields"],
+                    "text": ""
+                },
+                {
+                    "fallback": "Cannot Display Buttons",
+                    "title": "Would you like to create a timesheet for one of these engagements?",
+                    "callback_id": "enter_time",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": [
+                        {
+                            "name": "yes",
+                            "text": "Yes",
+                            "type": "button",
+                            "value": "yes"
+                        },
+                        {
+                            "name": "no",
+                            "text": "No",
+                            "type": "button",
+                            "value": "no"
+                        }
+                    ]
+                }]) + "<div>")
         }, function(err, response){
             console.log("Response: " + JSON.stringify(response));
             if (!err && response.ok === true) {
