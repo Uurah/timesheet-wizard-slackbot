@@ -172,8 +172,8 @@ var appRouter = function (app) {
             }]
         }, function(err, response){
             console.log("Response: " + JSON.stringify(response));
-            if (!err && response.body.ok === true) {
-                console.log(response);
+            if (!err && response.ok === true) {
+                console.log("Body: " + response.body);
                 res.status(200).send(response.body);
             } else {
                 console.log("Failed");
