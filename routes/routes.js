@@ -172,7 +172,7 @@ var appRouter = function (app) {
             }]
         }, function(err, response){
             console.log("Response: " + JSON.stringify(response));
-            if (!err && response.statusCode === 200) {
+            if (!err && response.ok === true) {
                 console.log(response);
                 res.status(200).send(response.body);
             } else {
