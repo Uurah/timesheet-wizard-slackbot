@@ -124,6 +124,77 @@ var appRouter = function (app) {
             });
         }
     });
+
+    app.post('/timesheet_check', function (req, res) {
+        //var json = JSON.stringify(eval("(" + req.body.payload + ")"));
+        //var actionJSON = JSON.parse(json);
+        //console.log("Action JSON: " + JSON.stringify(actionJSON));
+        if (req.body.token === 'xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1') {
+            var json = {
+                "token": "xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1",
+                "channel": req.body.user,
+                "text": "",
+                "as_user": false,
+                "attachments": [{
+                    "fallback": "This attachment isn't supported.",
+                    "title": "Your Daily Engagement Summary",
+                    "color": "#9c4c0d",
+                    "fields": [{
+                        "title": "Engagement",
+                        "value": req.body.engagements,
+                        "short": true
+                    }, {
+                        "title": "Hours Worked Today",
+                        "value": req.body.hours,
+                        "short": true
+                    }],
+                    "mrkdwn_in": ["text", "fields"],
+                    "text": ""
+                },
+                {
+                    "fallback": "Cannot Display Buttons",
+                    "title": "Would you like to create a timesheet for one of these engagements?",
+                    "callback_id": "enter_time",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": [
+                        {
+                            "name": "yes",
+                            "text": "Yes",
+                            "type": "button",
+                            "value": "yes"
+                        },
+                        {
+                            "name": "no",
+                            "text": "No",
+                            "type": "button",
+                            "value": "no"
+                        }
+                    ]
+                }]
+            };
+            request({
+                baseUrl: 'https://slack.com/api',
+                method: 'POST',
+                uri: '/chat.postMessage',
+                json: true,
+                body: json,
+                headers: {
+                    'Authorization': 'xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1',
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }, function (err, response, body) {
+                if (!err && response.statusCode === 200) {
+                    console.log("SUCCESS: " + body.result);
+                    return res.status(200).send(body.result);
+                } else {
+                    console.log("ERROR: " + err);
+                    return res.status(418).send(err);
+                }
+            });
+        }
+    });
 };
 
 module.exports = appRouter;
