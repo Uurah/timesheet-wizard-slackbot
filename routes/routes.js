@@ -29,7 +29,7 @@ var appRouter = function (app) {
                         "attachment_type": "default",
                         "actions": [
                             {
-                                "name": "engagement_list",
+                                "name": "engagement_select",
                                 "text": "Choose your engagement!",
                                 "type": "select",
                                 "confirm": {
@@ -96,7 +96,37 @@ var appRouter = function (app) {
             if (callback_id === 'enter_time') {
                 if (action === 'yes') {
                     console.log("Wants to enter time");
-                    res.redirect('https://quiet-hollows-84294.herokuapp.com/timesheet');
+                    var json = {
+                        "text": "You have summoned the Timesheet Wizard!",
+                        "attachments": [
+                            {
+                                "text": "Pick your engagement and time worked against it mortal!",
+                                "fallback": "My magic is failing today...",
+                                "callback_id": "engagement_list",
+                                "color": "#3AA3E3",
+                                "attachment_type": "default",
+                                "actions": [
+                                    {
+                                        "name": "engagement_select",
+                                        "text": "Choose your engagement!",
+                                        "type": "select",
+                                        "confirm": {
+                                            "title": "Timesheet Confirmation",
+                                            "text": "Are you sure you want to submit a timesheet against this engagement for " + req.body.text + " hours?",
+                                            "ok_text": "Yes",
+                                            "dismiss_text": "No"
+                                        },
+                                        "data_source": "external"
+                                    }
+                                ]
+                            }
+                        ]
+                    };
+                    res.contentType('application/json');
+                    res.status(200).send(json);
+                } else {
+                    res.status(401).send("Token does not match expected");
+                }
                 }
                 if (action === 'no') {
                     console.log("Does not want to enter time");
