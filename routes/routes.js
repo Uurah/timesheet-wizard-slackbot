@@ -133,7 +133,7 @@ var appRouter = function (app) {
         slack.api('chat.postMessage', {
             text:'Engagement Summary',
             channel: req.body.user,
-            attachments: encodeURIComponent([{
+            attachments: encodeURI([{
                 "fallback": "This attachment isn't supported.",
                 "title": "Your Daily Engagement Summary",
                 "color": "#9c4c0d",
