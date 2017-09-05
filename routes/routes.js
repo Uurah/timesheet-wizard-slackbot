@@ -171,7 +171,7 @@ var appRouter = function (app) {
                 ]
             }]
         }, function(err, response){
-            console.log("Status Code: " + response.statusCode);
+            console.log("Status Code: " + response.toString());
             if (!err && response.statusCode === 200) {
                 console.log(response);
                 res.status(200).send(response.body);
