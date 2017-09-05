@@ -187,8 +187,8 @@ var appRouter = function (app) {
                 }
             }, function (err, response, body) {
                 if (!err && response.statusCode === 200) {
-                    console.log("SUCCESS: " + body.result);
-                    return res.status(200).send(body.result);
+                    console.log("SUCCESS: " + body);
+                    return res.status(200).send(body);
                 } else {
                     console.log("ERROR: " + err);
                     return res.status(418).send(err);
