@@ -24,7 +24,7 @@ var appRouter = function (app) {
                     {
                         "text": "Pick your engagement and time worked against it mortal!",
                         "fallback": "My magic is failing today...",
-                        "callback_id": req.body.text,
+                        "callback_id": "engagement_list",
                         "color": "#3AA3E3",
                         "attachment_type": "default",
                         "actions": [
@@ -60,7 +60,7 @@ var appRouter = function (app) {
             var user_id = actionJSON.user.id;
             var action = actionJSON.actions[0].name;
             var callback_id = actionJSON.callback_id;
-            if (action === 'engagement_list') {
+            if (callback_id === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
                     var engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log('Action: ' + action);
@@ -93,8 +93,16 @@ var appRouter = function (app) {
                     }
                 });
             }
-            if (action === 'enter_time') {
-                console.log("Called enter time");
+            if (callback_id === 'enter_time') {
+                if (action === 'yes') {
+                    console.log("Wants to enter time");
+                }
+                if (action === 'no') {
+                    console.log("Does not want to enter time");
+                }
+            }
+            else {
+                console.log("Callback_id does not match any expected");
             }
         } else {
             console.log("Token from Slack did not match expected token");
