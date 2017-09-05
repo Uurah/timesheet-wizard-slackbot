@@ -129,12 +129,23 @@ var appRouter = function (app) {
         //var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         //var actionJSON = JSON.parse(json);
         //console.log("Action JSON: " + JSON.stringify(actionJSON));
+        slack.api('chat.postMessage', {
+            text:'hello from nodejs',
+            channel: req.body.user
+        }, function(err, response){
+            console.log(response);
+        });
+/*
         console.log("User: " + req.body.user);
         console.log("Engagement String: " + req.body.engagements);
         console.log("Hour String: " + req.body.hours);
         if (req.body.token === 'xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1') {
             var json = {
-                "token": "xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1",
+                "access_token": "xoxp-136089629350-137523975635-226941757556-819bea999b4d0eb7e9afd097e2483205",
+                "bot": {
+                    "bot_user_id":"UTTTTTTTTTTR",
+                    "bot_access_token":"xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1"
+                },
                 "channel": req.body.user,
                 "text": "",
                 "as_user": false,
@@ -196,7 +207,7 @@ var appRouter = function (app) {
                     return res.status(418).send(err);
                 }
             });
-        }
+        }*/
     });
 };
 
