@@ -96,9 +96,11 @@ var appRouter = function (app) {
             if (callback_id === 'enter_time') {
                 if (action === 'yes') {
                     console.log("Wants to enter time");
+                    app.redirect('/timesheet');
                 }
                 if (action === 'no') {
                     console.log("Does not want to enter time");
+                    res.status(200).send({"text": "Then begone with you!"});
                 }
             }
             else {
