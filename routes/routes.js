@@ -152,11 +152,18 @@ var appRouter = function (app) {
             var callback_id = actionJSON.callback_id;
 
             if(callback_id === 'start_work') {
-                messageStore[actionJSON.trigger_id].engagement = actionJSON.actions[0].selected_options[0].value;
-                messageStore[actionJSON.message_ts] = messageStore[actionJSON.trigger_id];
-                res.contentType('application/json');
-                res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
-                delete messageStore[actionJSON.trigger_id];
+                for (var key in messageStore) {
+                    if (messageStore.hasOwnProperty(key)) {
+                        if (key.user === 'user_id') {
+                            console.log("Found Match in Message Store");
+                            messageStore[actionJSON.message_ts] = messageStore[key];
+                            messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
+                            res.contentType('application/json');
+                            res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
+                            delete messageStore[key];
+                        }
+                    }
+                }
             }
 
             if (callback_id === 'submit_stopwatch') {
