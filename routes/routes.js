@@ -100,11 +100,11 @@ var appRouter = function (app) {
                     if (messageStore[key].user.toString() === req.body.user_id.toString()) {
                         console.log("Found Match in Message Store");
                         messageStore[key].end = (new Date().getTime() / 1000);
-                        var time_worked = parseFloat((messageStore[key].end - messageStore[key].start) / 3600);
+                        var time_worked = parseFloat((messageStore[key].end - messageStore[key].start) / 3600).toFixed(2);
                         messageStore[key].time_worked = time_worked;
                         console.log("Time Worked: " + time_worked);
                         var additional_time = [{
-                            //text: "By my calculations, you have worked " + time_worked + " hours against the current engagement.",
+                            text: "By my calculations, you have worked " + messageStore[key].time_worked + " hours against the current engagement.",
                             fallback: "Cannot Display Buttons",
                             title: "Is this correct?",
                             callback_id: "submit_stopwatch",
@@ -124,7 +124,6 @@ var appRouter = function (app) {
                                     value: "no"
                                 }
                             ]
-
                         }];
                         slack.api('chat.postEphemeral', {
                             //text: body.result.text,
@@ -135,7 +134,7 @@ var appRouter = function (app) {
                             console.log("Response: " + JSON.stringify(response));
                             if (!err && response.ok === true) {
                                 console.log("Body: " + response);
-                                res.status(200).send("By my calculations, you have worked " + messageStore[key].time_worked + " hours against the current engagement.");
+                                res.status(200).send("I have stopped tracking time against this engagement.");
                             } else {
                                 console.log("Failed");
                                 res.status(400).send(err);
@@ -177,30 +176,39 @@ var appRouter = function (app) {
             }
 
             if (callback_id === 'submit_stopwatch') {
-                request({
-                    baseUrl: instanceURL,
-                    method: 'POST',
-                    uri: apiURI + '/engagement_selected',
-                    json: true,
-                    body: {
-                        "user": messageStore[actionJSON.message_ts].engagement.user,
-                        "engagement": messageStore[actionJSON.message_ts].engagement,
-                        "time_worked": messageStore[actionJSON.message_ts].time_worked
-                    },
-                    headers: {
-                        'Authorization': 'basic ' + encoded,
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json'
+                for (var key2 in messageStore) {
+                    if (messageStore.hasOwnProperty(key)) {
+                        console.log("Message Store Key " + key2 + " and user " + messageStore[key2].user);
+                        if (messageStore[key2].user.toString() === user_id.toString()) {
+                            console.log("Found Match in Message Store");
+                            request({
+                                baseUrl: instanceURL,
+                                method: 'POST',
+                                uri: apiURI + '/engagement_selected',
+                                json: true,
+                                body: {
+                                    "user": messageStore[key2].engagement.user,
+                                    "engagement": messageStore[key2].engagement,
+                                    "time_worked": messageStore[key2].time_worked
+                                },
+                                headers: {
+                                    'Authorization': 'basic ' + encoded,
+                                    'accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                }
+                            }, function (err, response, body) {
+                                if (!err && response.statusCode === 200) {
+                                    console.log("SUCCESS: " + body.result);
+                                    delete messageStore[key2];
+                                    return res.status(200).send(body.result);
+                                } else {
+                                    console.log("ERROR: " + err);
+                                    return res.status(418).send(err);
+                                }
+                            });
+                        }
                     }
-                }, function (err, response, body) {
-                    if (!err && response.statusCode === 200) {
-                        console.log("SUCCESS: " + body.result);
-                        return res.status(200).send(body.result);
-                    } else {
-                        console.log("ERROR: " + err);
-                        return res.status(418).send(err);
-                    }
-                });
+                }
             }
 
             if (callback_id === 'engagement_list') {
