@@ -159,6 +159,8 @@ var appRouter = function (app) {
             var action = actionJSON.actions[0].name.toString();
             var callback_id = actionJSON.callback_id.toString();
 
+            console.log("Callback ID: " + callback_id);
+
             if(callback_id === 'start_work') {
                 for (var key in messageStore) {
                     if (messageStore.hasOwnProperty(key)) {
@@ -175,7 +177,7 @@ var appRouter = function (app) {
                 }
             }
 
-            if (callback_id === 'submit_stopwatch') {
+            else if (callback_id === 'submit_stopwatch') {
                 if (action === 'yes') {
                     for (var key2 in messageStore) {
                         if (messageStore.hasOwnProperty(key)) {
@@ -217,7 +219,7 @@ var appRouter = function (app) {
                 }
             }
 
-            if (callback_id === 'engagement_list') {
+            else if (callback_id === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
                     var engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log('Action: ' + action);
@@ -250,7 +252,7 @@ var appRouter = function (app) {
                     }
                 });
             }
-            if (callback_id === 'enter_time') {
+            else if (callback_id === 'enter_time') {
                 if (action === 'yes') {
                     console.log("Wants to enter time");
                     messageStore[actionJSON.message_ts] = {
@@ -285,7 +287,7 @@ var appRouter = function (app) {
                     res.status(200).send({"text": "Then begone with you!"});
                 }
             }
-            if (callback_id === 'engagement_selected') {
+            else if (callback_id === 'engagement_selected') {
                 if ( messageStore[actionJSON.message_ts].hasOwnProperty('engagement')) {
                     messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
@@ -348,7 +350,7 @@ var appRouter = function (app) {
                 res.contentType('application/json');
                 res.status(200).send(es);
             }
-            if (callback_id === 'hours_entered') {
+            else if (callback_id === 'hours_entered') {
                 if ( messageStore[actionJSON.message_ts].hasOwnProperty('hours')) {
                     messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
                     console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
