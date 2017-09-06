@@ -102,6 +102,10 @@ var appRouter = function (app) {
             if (callback_id === 'enter_time') {
                 if (action === 'yes') {
                     console.log("Wants to enter time");
+                    messageStore[actionJSON.message_ts] = {
+                        "engagement": null,
+                        "hours": null
+                    };
                     var twjson = {
                         "text": "You have summoned the Timesheet Wizard!",
                         "attachments": [
@@ -131,8 +135,12 @@ var appRouter = function (app) {
                 }
             }
             if (callback_id === 'engagement_selected') {
-                //messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
-                //console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
+                if ( messageStore[actionJSON.message_ts].hasOwnProperty('engagement')) {
+                    messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
+                    console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
+                } else {
+                    console.log("Missing engagement property");
+                }
                 var es = {
                     "text": "",
                     "attachments": [
@@ -190,15 +198,14 @@ var appRouter = function (app) {
                 res.status(200).send(es);
             }
             if (callback_id === 'hours_entered') {
-                messageStore[actionJSON.message_ts] = {
-                    "engagement": actionJSON.original_message.actions[0].selected_options[0].value,
-                    "hours": actionJSON.actions[0].selected_options[0].value
+                if ( messageStore[actionJSON.message_ts].hasOwnProperty('hours')) {
+                    messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
+                    console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
+                } else {
+                    console.log("Missing hours property");
                 }
-                //messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
-                //console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
-
-                if (messageStore[actionJSON.message_ts].hasOwnProperty('hours') && messageStore[actionJSON.message_ts].hasOwnProperty('engagement')) {
-                    console.log("Has Properties");
+                if (messageStore[actionJSON.message_ts].hours !== null && messageStore[actionJSON.message_ts].engagement !== null) {
+                    console.log("Properties not null");
                     var timesheetJSON = {
                         "user": user_id,
                         "engagement": messageStore[actionJSON.message_ts].engagement,
@@ -226,7 +233,7 @@ var appRouter = function (app) {
                         }
                     });
                 } else {
-                    console.log("Message Store is missing a parameter needed to send to SNOW");
+                    console.log("Message Store is missing one or more parameters needed to send to SNOW");
                 }
             }
             else {
