@@ -247,14 +247,14 @@ var appRouter = function (app) {
 
                             }];
                             slack.api('chat.postMessage', {
-                                text: body.result.text,
+                                //text: body.result.text,
                                 channel: user_id,
                                 attachments: JSON.stringify(additional_time)
                             }, function(err, response){
                                 console.log("Response: " + JSON.stringify(response));
                                 if (!err && response.ok === true) {
                                     console.log("Body: " + response);
-                                    res.status(200);
+                                    res.status(200).send(body.result.text);
                                 } else {
                                     console.log("Failed");
                                     res.status(400).send(err);
