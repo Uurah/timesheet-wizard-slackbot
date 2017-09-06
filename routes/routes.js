@@ -92,11 +92,12 @@ var appRouter = function (app) {
     });
 
     app.post('/stop', urlencodedParser, function (req, res) {
-        console.log("Req: " + req.body.token);
+        console.log("Req: " + req.body);
         if (req.body.token === verificationToken) {
             messageStore[req.body.message_ts].end = (new Date().getTime() / 1000);
             var time_worked = parseFloat((messageStore[req.body.message_ts].end - messageStore[req.body.message_ts].start) / 3600);
             messageStore[req.body.message_ts].time_worked = time_worked;
+            console.log("Time Worked: " + time_worked);
             var additional_time = [{
                 //text: "By my calculations, you have worked " + time_worked + " hours against the current engagement.",
                 fallback: "Cannot Display Buttons",
