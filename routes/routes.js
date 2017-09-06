@@ -219,7 +219,7 @@ var appRouter = function (app) {
                         body: {
                             "user": user_id,
                             "engagement": messageStore[actionJSON.message_ts].engagement,
-                            "hours": messageStore[actionJSON.message_ts].hours
+                            "time_worked": messageStore[actionJSON.message_ts].hours
                         },
                         headers: {
                             'Authorization': 'basic ' + encoded,
