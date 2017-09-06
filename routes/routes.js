@@ -190,9 +190,9 @@ var appRouter = function (app) {
                                     uri: apiURI + '/stopwatch',
                                     json: true,
                                     body: {
-                                        "user": messageStore[key2].user,
-                                        "engagement": messageStore[key2].engagement,
-                                        "time_worked": messageStore[key2].time_worked
+                                        "user": messageStore[key2].user.toString(),
+                                        "engagement": messageStore[key2].engagement.toString(),
+                                        "time_worked": messageStore[key2].time_worked.toString()
                                     },
                                     headers: {
                                         'Authorization': 'basic ' + encoded,
