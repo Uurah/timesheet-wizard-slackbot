@@ -94,9 +94,9 @@ var appRouter = function (app) {
     app.post('/stop', urlencodedParser, function (req, res) {
         console.log("Req: " + req.body.token);
         if (req.body.token === verificationToken) {
-            messageStore[req.body.trigger_id].end = (new Date().getTime() / 1000);
-            var time_worked = parseFloat((messageStore[req.body.trigger_id].end - messageStore[req.body.trigger_id].start) / 3600);
-            messageStore[req.body.trigger_id].time_worked = time_worked;
+            messageStore[req.body.message_ts].end = (new Date().getTime() / 1000);
+            var time_worked = parseFloat((messageStore[req.body.message_ts].end - messageStore[req.body.message_ts].start) / 3600);
+            messageStore[req.body.message_ts].time_worked = time_worked;
             var additional_time = [{
                 //text: "By my calculations, you have worked " + time_worked + " hours against the current engagement.",
                 fallback: "Cannot Display Buttons",
@@ -122,8 +122,8 @@ var appRouter = function (app) {
             }];
             slack.api('chat.postEphemeral', {
                 //text: body.result.text,
-                channel:  messageStore[req.body.trigger_id].channel,
-                user:  messageStore[req.body.trigger_id].user,
+                channel:  messageStore[req.body.message_ts].channel,
+                user:  messageStore[req.body.message_ts].user,
                 attachments: JSON.stringify(additional_time)
             }, function (err, response) {
                 console.log("Response: " + JSON.stringify(response));
@@ -153,8 +153,10 @@ var appRouter = function (app) {
 
             if(callback_id === 'start_work') {
                 messageStore[actionJSON.trigger_id].engagement = actionJSON.actions[0].selected_options[0].value;
+                messageStore[actionJSON.message_ts] = messageStore[actionJSON.trigger_id];
                 res.contentType('application/json');
                 res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
+                delete messageStore[actionJSON.trigger_id];
             }
 
             if (callback_id === 'submit_stopwatch') {
@@ -164,9 +166,9 @@ var appRouter = function (app) {
                     uri: apiURI + '/engagement_selected',
                     json: true,
                     body: {
-                        "user": messageStore[actionJSON.trigger_id].engagement.user,
-                        "engagement": messageStore[actionJSON.trigger_id].engagement,
-                        "time_worked": messageStore[actionJSON.trigger_id].time_worked
+                        "user": messageStore[actionJSON.message_ts].engagement.user,
+                        "engagement": messageStore[actionJSON.message_ts].engagement,
+                        "time_worked": messageStore[actionJSON.message_ts].time_worked
                     },
                     headers: {
                         'Authorization': 'basic ' + encoded,
