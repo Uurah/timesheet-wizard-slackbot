@@ -98,7 +98,7 @@ var appRouter = function (app) {
                 if (messageStore.hasOwnProperty(key)) {
                     console.log("Message Store Key " + key + " and user " + messageStore[key].user);
                     if (messageStore[key].user.toString() === req.body.user_id.toString()) {
-                        console.log("Found Match in Message Store");
+                        console.log("Found Match in Message Store, stopping timer");
                         messageStore[key].end = (new Date().getTime() / 1000);
                         var time_worked = parseFloat((messageStore[key].end - messageStore[key].start) / 3600).toFixed(2);
                         messageStore[key].time_worked = time_worked;
@@ -164,7 +164,7 @@ var appRouter = function (app) {
                     if (messageStore.hasOwnProperty(key)) {
                         console.log("Message Store Key " + key + " and user " + messageStore[key].user);
                         if (messageStore[key].user.toString() === user_id.toString()) {
-                            console.log("Found Match in Message Store");
+                            console.log("Found Match in Message Store, creating new message");
                             messageStore[actionJSON.message_ts] = messageStore[key];
                             messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
                             res.contentType('application/json');
@@ -180,7 +180,7 @@ var appRouter = function (app) {
                     if (messageStore.hasOwnProperty(key)) {
                         console.log("Message Store Key " + key2 + " and user " + messageStore[key2].user);
                         if (messageStore[key2].user.toString() === user_id.toString()) {
-                            console.log("Found Match in Message Store");
+                            console.log("Found Match in Message Store, sending time to SNOW");
                             request({
                                 baseUrl: instanceURL,
                                 method: 'POST',
