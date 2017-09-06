@@ -90,7 +90,7 @@ var appRouter = function (app) {
                     }
                 }, function (err, response, body) {
                     if (!err && response.statusCode === 200) {
-                        console.log("SUCCESS: " + body.result);
+                        console.log("SUCCESS: " + JSON.stringify(body.result));
                         return res.status(200).send(body.result);
                     } else {
                         console.log("ERROR: " + err);
