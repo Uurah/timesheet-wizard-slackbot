@@ -205,18 +205,22 @@ var appRouter = function (app) {
                 }
                 if (messageStore[actionJSON.message_ts].hours !== null && messageStore[actionJSON.message_ts].engagement !== null) {
                     console.log("Properties not null");
-                    var timesheetJSON = {
+                    /*var timesheetJSON = {
                         "user": user_id,
                         "engagement": messageStore[actionJSON.message_ts].engagement,
                         "hours": messageStore[actionJSON.message_ts].hours
                     };
-                    console.log("Timesheet JSON: " + JSON.stringify(timesheetJSON));
+                    console.log("Timesheet JSON: " + JSON.stringify(timesheetJSON));*/
                     request({
                         baseUrl: instanceURL,
                         method: 'POST',
                         uri: apiURI + '/engagement_selected',
                         json: true,
-                        body: timesheetJSON,
+                        body: {
+                            "user": user_id,
+                            "engagement": messageStore[actionJSON.message_ts].engagement,
+                            "hours": messageStore[actionJSON.message_ts].hours
+                        },
                         headers: {
                             'Authorization': 'basic ' + encoded,
                             'accept': 'application/json',
