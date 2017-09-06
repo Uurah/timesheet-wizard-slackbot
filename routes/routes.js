@@ -204,13 +204,6 @@ var appRouter = function (app) {
                     console.log("Missing hours property");
                 }
                 if (messageStore[actionJSON.message_ts].hours !== null && messageStore[actionJSON.message_ts].engagement !== null) {
-                    console.log("Properties not null");
-                    /*var timesheetJSON = {
-                        "user": user_id,
-                        "engagement": messageStore[actionJSON.message_ts].engagement,
-                        "hours": messageStore[actionJSON.message_ts].hours
-                    };
-                    console.log("Timesheet JSON: " + JSON.stringify(timesheetJSON));*/
                     request({
                         baseUrl: instanceURL,
                         method: 'POST',
@@ -230,10 +223,33 @@ var appRouter = function (app) {
                         if (!err && response.statusCode === 200) {
                             console.log("SUCCESS: " + JSON.stringify(body.result));
                             delete messageStore[actionJSON.message_ts];
-                            return res.status(200).send(body.result);
+                            var additional_time = {
+                                "text": body.result,
+                                "fallback": "Cannot Display Buttons",
+                                "title": "Would you like to time against an additional engagement?",
+                                "callback_id": "enter_time",
+                                "color": "#3AA3E3",
+                                "attachment_type": "default",
+                                "actions": [
+                                    {
+                                        "name": "yes",
+                                        "text": "Yes",
+                                        "type": "button",
+                                        "value": "yes"
+                                    },
+                                    {
+                                        "name": "no",
+                                        "text": "No",
+                                        "type": "button",
+                                        "value": "no"
+                                    }
+                                ]
+
+                            };
+                            return res.status(200).send(additional_time);
                         } else {
                             console.log("ERROR: " + err);
-                            return res.status(418).send(err);
+                            return res.status(418).send({ "text": "Could not create timesheet."});
                         }
                     });
                 } else {
