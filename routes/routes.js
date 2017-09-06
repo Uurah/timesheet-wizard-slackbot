@@ -94,48 +94,56 @@ var appRouter = function (app) {
     app.post('/stop', urlencodedParser, function (req, res) {
         console.log("Req: " + req.body);
         if (req.body.token === verificationToken) {
-            messageStore[req.body.message_ts].end = (new Date().getTime() / 1000);
-            var time_worked = parseFloat((messageStore[req.body.message_ts].end - messageStore[req.body.message_ts].start) / 3600);
-            messageStore[req.body.message_ts].time_worked = time_worked;
-            console.log("Time Worked: " + time_worked);
-            var additional_time = [{
-                //text: "By my calculations, you have worked " + time_worked + " hours against the current engagement.",
-                fallback: "Cannot Display Buttons",
-                title: "Is this correct?",
-                callback_id: "submit_stopwatch",
-                color: "#3AA3E3",
-                attachment_type: "default",
-                actions: [
-                    {
-                        name: "yes",
-                        text: "Yes",
-                        type: "button",
-                        value: "yes"
-                    },
-                    {
-                        name: "no",
-                        text: "No",
-                        type: "button",
-                        value: "no"
-                    }
-                ]
+            for (var key in messageStore) {
+                if (messageStore.hasOwnProperty(key)) {
+                    console.log("Message Store Key " + key + " and user " + messageStore[key].user);
+                    if (messageStore[key].user.toString() === req.body.user_id.toString()) {
+                        console.log("Found Match in Message Store");
+                        messageStore[key].end = (new Date().getTime() / 1000);
+                        var time_worked = parseFloat((messageStore[key].end - messageStore[key].start) / 3600);
+                        messageStore[key].time_worked = time_worked;
+                        console.log("Time Worked: " + time_worked);
+                        var additional_time = [{
+                            //text: "By my calculations, you have worked " + time_worked + " hours against the current engagement.",
+                            fallback: "Cannot Display Buttons",
+                            title: "Is this correct?",
+                            callback_id: "submit_stopwatch",
+                            color: "#3AA3E3",
+                            attachment_type: "default",
+                            actions: [
+                                {
+                                    name: "yes",
+                                    text: "Yes",
+                                    type: "button",
+                                    value: "yes"
+                                },
+                                {
+                                    name: "no",
+                                    text: "No",
+                                    type: "button",
+                                    value: "no"
+                                }
+                            ]
 
-            }];
-            slack.api('chat.postEphemeral', {
-                //text: body.result.text,
-                channel:  messageStore[req.body.message_ts].channel,
-                user:  messageStore[req.body.message_ts].user,
-                attachments: JSON.stringify(additional_time)
-            }, function (err, response) {
-                console.log("Response: " + JSON.stringify(response));
-                if (!err && response.ok === true) {
-                    console.log("Body: " + response);
-                    res.status(200).send("By my calculations, you have worked " + time_worked + " hours against the current engagement.");
-                } else {
-                    console.log("Failed");
-                    res.status(400).send(err);
+                        }];
+                        slack.api('chat.postEphemeral', {
+                            //text: body.result.text,
+                            channel:  messageStore[key].channel,
+                            user:  messageStore[key].user,
+                            attachments: JSON.stringify(additional_time)
+                        }, function (err, response) {
+                            console.log("Response: " + JSON.stringify(response));
+                            if (!err && response.ok === true) {
+                                console.log("Body: " + response);
+                                res.status(200).send("By my calculations, you have worked " + messageStore[key].time_worked + " hours against the current engagement.");
+                            } else {
+                                console.log("Failed");
+                                res.status(400).send(err);
+                            }
+                        });
+                    }
                 }
-            });
+            }
         } else {
             res.status(401).send("Token does not match expected");
         }
