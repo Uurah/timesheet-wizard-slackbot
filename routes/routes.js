@@ -92,7 +92,7 @@ var appRouter = function (app) {
     });
 
     app.post('/stop', urlencodedParser, function (req, res) {
-        console.log("Req: " + req.body);
+        console.log("Req: " + JSON.stringify(req.body));
         if (req.body.token === verificationToken) {
             messageStore[req.body.user_id].end = (new Date().getTime() / 1000);
             var time_worked = parseFloat((messageStore[req.body.user_id].end - messageStore[req.body.user_id].start) / 3600).toFixed(2);
