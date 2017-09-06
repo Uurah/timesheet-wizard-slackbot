@@ -176,38 +176,44 @@ var appRouter = function (app) {
             }
 
             if (callback_id === 'submit_stopwatch') {
-                for (var key2 in messageStore) {
-                    if (messageStore.hasOwnProperty(key)) {
-                        console.log("Message Store Key " + key2 + " and user " + messageStore[key2].user);
-                        if (messageStore[key2].user.toString() === user_id.toString()) {
-                            console.log("Found Match in Message Store, sending time to SNOW");
-                            request({
-                                baseUrl: instanceURL,
-                                method: 'POST',
-                                uri: apiURI + '/engagement_selected',
-                                json: true,
-                                body: {
-                                    "user": messageStore[key2].engagement.user,
-                                    "engagement": messageStore[key2].engagement,
-                                    "time_worked": messageStore[key2].time_worked
-                                },
-                                headers: {
-                                    'Authorization': 'basic ' + encoded,
-                                    'accept': 'application/json',
-                                    'Content-Type': 'application/json'
-                                }
-                            }, function (err, response, body) {
-                                if (!err && response.statusCode === 200) {
-                                    console.log("SUCCESS: " + body.result);
-                                    delete messageStore[key2];
-                                    return res.status(200).send(body.result);
-                                } else {
-                                    console.log("ERROR: " + err);
-                                    return res.status(418).send(err);
-                                }
-                            });
+                if (action === 'yes') {
+                    for (var key2 in messageStore) {
+                        if (messageStore.hasOwnProperty(key)) {
+                            console.log("Message Store Key " + key2 + " and user " + messageStore[key2].user);
+                            if (messageStore[key2].user.toString() === user_id.toString()) {
+                                console.log("Found Match in Message Store, sending time to SNOW");
+                                request({
+                                    baseUrl: instanceURL,
+                                    method: 'POST',
+                                    uri: apiURI + '/engagement_selected',
+                                    json: true,
+                                    body: {
+                                        "user": messageStore[key2].user,
+                                        "engagement": messageStore[key2].engagement,
+                                        "time_worked": messageStore[key2].time_worked
+                                    },
+                                    headers: {
+                                        'Authorization': 'basic ' + encoded,
+                                        'accept': 'application/json',
+                                        'Content-Type': 'application/json'
+                                    }
+                                }, function (err, response, body) {
+                                    if (!err && response.statusCode === 200) {
+                                        console.log("SUCCESS: " + body.result);
+                                        delete messageStore[key2];
+                                        return res.status(200).send(body.result);
+                                    } else {
+                                        console.log("ERROR: " + err);
+                                        return res.status(418).send(err);
+                                    }
+                                });
+                            }
                         }
                     }
+                }
+                if (action === 'no') {
+                    console.log("Time not correct");
+                    res.status(200).send({"text": "Sorry!  I'm a forgetful wizard sometimes.  You'll have to create a timesheet the old fashioned way this time!"});
                 }
             }
 
