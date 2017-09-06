@@ -54,7 +54,7 @@ var appRouter = function (app) {
     });
 
     app.post('/start', urlencodedParser, function (req, res) {
-        console.log("Req: " + req.body);
+        console.log("Req: " + JSON.stringify(req.body));
         if (req.body.token === verificationToken) {
             messageStore[req.body.message_ts] = {
                 "start": (new Date().getTime() / 1000),
