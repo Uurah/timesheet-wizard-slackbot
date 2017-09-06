@@ -221,12 +221,12 @@ var appRouter = function (app) {
                         }
                     }, function (err, response, body) {
                         if (!err && response.statusCode === 200) {
-                            console.log("SUCCESS: " + JSON.stringify(body.result));
+                            console.log("SUCCESS: " + JSON.stringify(body.result.text));
                             delete messageStore[actionJSON.message_ts];
                             var additional_time = [{
-                                text: body.result,
+                                //text: body.result.text,
                                 fallback: "Cannot Display Buttons",
-                                title: "Would you like to time against an additional engagement?",
+                                title: "Would you like to enter time against an additional engagement?",
                                 callback_id: "enter_time",
                                 color: "#3AA3E3",
                                 attachment_type: "default",
@@ -247,7 +247,7 @@ var appRouter = function (app) {
 
                             }];
                             slack.api('chat.postMessage', {
-                                text:body.result,
+                                text: body.result.text,
                                 channel: user_id,
                                 attachments: JSON.stringify(additional_time)
                             }, function(err, response){
