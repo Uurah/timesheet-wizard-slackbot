@@ -155,9 +155,9 @@ var appRouter = function (app) {
 
         if (actionJSON.token === verificationToken) {
 
-            var user_id = actionJSON.user.id;
-            var action = actionJSON.actions[0].name;
-            var callback_id = actionJSON.callback_id;
+            var user_id = actionJSON.user.id.toString();
+            var action = actionJSON.actions[0].name.toString();
+            var callback_id = actionJSON.callback_id.toString();
 
             if(callback_id === 'start_work') {
                 for (var key in messageStore) {
