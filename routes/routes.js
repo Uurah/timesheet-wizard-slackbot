@@ -155,7 +155,7 @@ var appRouter = function (app) {
                 for (var key in messageStore) {
                     if (messageStore.hasOwnProperty(key)) {
                         console.log("Message Store Key " + key + " and user " + messageStore[key].user);
-                        if (key.user === user_id) {
+                        if (key.user.toString() === user_id.toString()) {
                             console.log("Found Match in Message Store");
                             messageStore[actionJSON.message_ts] = messageStore[key];
                             messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
