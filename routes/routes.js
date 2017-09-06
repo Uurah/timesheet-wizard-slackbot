@@ -275,6 +275,7 @@ var appRouter = function (app) {
     });
 
     app.post('/timesheet_check', function (req, res) {
+        console.log("Request: " + JSON.stringify(req));
         //var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         //var actionJSON = JSON.parse(json);
         //console.log("Action JSON: " + JSON.stringify(actionJSON));
