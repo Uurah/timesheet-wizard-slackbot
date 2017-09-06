@@ -131,8 +131,8 @@ var appRouter = function (app) {
                 }
             }
             if (callback_id === 'engagement_selected') {
-                messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
-                console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
+                //messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
+                //console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
                 var es = {
                     "text": "",
                     "attachments": [
@@ -190,10 +190,15 @@ var appRouter = function (app) {
                 res.status(200).send(es);
             }
             if (callback_id === 'hours_entered') {
-                messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
-                console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
+                messageStore[actionJSON.message_ts] = {
+                    "engagement": actionJSON.original_message.actions[0].selected_options[0].value,
+                    "hours": actionJSON.actions[0].selected_options[0].value
+                }
+                //messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
+                //console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
 
                 if (messageStore[actionJSON.message_ts].hasOwnProperty('hours') && messageStore[actionJSON.message_ts].hasOwnProperty('engagement')) {
+                    console.log("Has Properties");
                     var timesheetJSON = {
                         "user": user_id,
                         "engagement": messageStore[actionJSON.message_ts].engagement,
