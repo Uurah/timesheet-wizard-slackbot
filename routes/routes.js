@@ -56,11 +56,11 @@ var appRouter = function (app) {
     app.post('/start', urlencodedParser, function (req, res) {
         console.log("Req: " + JSON.stringify(req.body));
         if (req.body.token === verificationToken) {
-            messageStore[req.body.trigger_id] = {
+            messageStore[req.body.user_id] = {
                 "start": (new Date().getTime() / 1000),
                 "end": '',
                 "engagement": '',
-                "user": req.body.user_id,
+                //"user": req.body.user_id,
                 "channel": req.body.channel_id,
                 "time_worked": 0
             };
@@ -94,55 +94,47 @@ var appRouter = function (app) {
     app.post('/stop', urlencodedParser, function (req, res) {
         console.log("Req: " + req.body);
         if (req.body.token === verificationToken) {
-            for (var key in messageStore) {
-                if (messageStore.hasOwnProperty(key)) {
-                    console.log("Message Store Key " + key + " and user " + messageStore[key].user);
-                    if (messageStore[key].user.toString() === req.body.user_id.toString()) {
-                        console.log("Found Match in Message Store, stopping timer");
-                        messageStore[key].end = (new Date().getTime() / 1000);
-                        var time_worked = parseFloat((messageStore[key].end - messageStore[key].start) / 3600).toFixed(2);
-                        messageStore[key].time_worked = time_worked;
-                        console.log("Time Worked: " + time_worked);
-                        var additional_time = [{
-                            text: "By my calculations, you have worked " + messageStore[key].time_worked + " hours against the current engagement.",
-                            fallback: "Cannot Display Buttons",
-                            title: "Is this correct?",
-                            callback_id: "submit_stopwatch",
-                            color: "#3AA3E3",
-                            attachment_type: "default",
-                            actions: [
-                                {
-                                    name: "yes",
-                                    text: "Yes",
-                                    type: "button",
-                                    value: "yes"
-                                },
-                                {
-                                    name: "no",
-                                    text: "No",
-                                    type: "button",
-                                    value: "no"
-                                }
-                            ]
-                        }];
-                        slack.api('chat.postEphemeral', {
-                            //text: body.result.text,
-                            channel:  messageStore[key].channel,
-                            user:  messageStore[key].user,
-                            attachments: JSON.stringify(additional_time)
-                        }, function (err, response) {
-                            console.log("Response: " + JSON.stringify(response));
-                            if (!err && response.ok === true) {
-                                console.log("Body: " + response);
-                                res.status(200).send("I have stopped tracking time against this engagement.");
-                            } else {
-                                console.log("Failed");
-                                res.status(400).send(err);
-                            }
-                        });
+            messageStore[req.body.user_id].end = (new Date().getTime() / 1000);
+            var time_worked = parseFloat((messageStore[req.body.user_id].end - messageStore[req.body.user_id].start) / 3600).toFixed(2);
+            messageStore[req.body.user_id].time_worked = time_worked;
+            console.log("Time Worked: " + time_worked);
+            var additional_time = [{
+                text: "By my calculations, you have worked " + messageStore[req.body.user_id].time_worked + " hours against the current engagement.",
+                fallback: "Cannot Display Buttons",
+                title: "Is this correct?",
+                callback_id: "submit_stopwatch",
+                color: "#3AA3E3",
+                attachment_type: "default",
+                actions: [
+                    {
+                        name: "yes",
+                        text: "Yes",
+                        type: "button",
+                        value: "yes"
+                    },
+                    {
+                        name: "no",
+                        text: "No",
+                        type: "button",
+                        value: "no"
                     }
+                ]
+            }];
+            slack.api('chat.postEphemeral', {
+                //text: body.result.text,
+                channel:  messageStore[req.body.user_id].channel,
+                user:  messageStore[req.body.user_id].user,
+                attachments: JSON.stringify(additional_time)
+            }, function (err, response) {
+                console.log("Response: " + JSON.stringify(response));
+                if (!err && response.ok === true) {
+                    console.log("Body: " + response);
+                    res.status(200).send("I have stopped tracking time against this engagement.");
+                } else {
+                    console.log("Failed");
+                    res.status(400).send(err);
                 }
-            }
+            });
         } else {
             res.status(401).send("Token does not match expected");
         }
@@ -162,56 +154,38 @@ var appRouter = function (app) {
             console.log("Callback ID: " + callback_id);
 
             if(callback_id === 'start_work') {
-                for (var key in messageStore) {
-                    if (messageStore.hasOwnProperty(key)) {
-                        console.log("Message Store Key " + key + " and user " + messageStore[key].user);
-                        if (messageStore[key].user.toString() === user_id.toString()) {
-                            console.log("Found Match in Message Store, creating new message");
-                            messageStore[actionJSON.message_ts] = messageStore[key];
-                            messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
-                            res.contentType('application/json');
-                            res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
-                            delete messageStore[key];
-                        }
-                    }
-                }
+                messageStore[user_id].engagement = actionJSON.actions[0].selected_options[0].value;
+                res.contentType('application/json');
+                res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
             }
 
             else if (callback_id === 'submit_stopwatch') {
                 if (action === 'yes') {
-                    for (var key2 in messageStore) {
-                        if (messageStore.hasOwnProperty(key2)) {
-                            console.log("Message Store Key " + key2 + " and user " + messageStore[key2].user);
-                            if (messageStore[key2].user.toString() === user_id.toString()) {
-                                console.log("Found Match in Message Store, sending time to SNOW");
-                                request({
-                                    baseUrl: instanceURL,
-                                    method: 'POST',
-                                    uri: apiURI + '/stopwatch',
-                                    json: true,
-                                    body: {
-                                        "user": messageStore[key2].user.toString(),
-                                        "engagement": messageStore[key2].engagement.toString(),
-                                        "time_worked": messageStore[key2].time_worked.toString()
-                                    },
-                                    headers: {
-                                        'Authorization': 'basic ' + encoded,
-                                        'accept': 'application/json',
-                                        'Content-Type': 'application/json'
-                                    }
-                                }, function (err, response, body) {
-                                    if (!err && response.statusCode === 200) {
-                                        console.log("SUCCESS: " + body.result);
-                                        delete messageStore[key2];
-                                        return res.status(200).send(body.result);
-                                    } else {
-                                        console.log("ERROR: " + JSON.stringify(body));
-                                        return res.status(418).send(body);
-                                    }
-                                });
-                            }
+                    request({
+                        baseUrl: instanceURL,
+                        method: 'POST',
+                        uri: apiURI + '/stopwatch',
+                        json: true,
+                        body: {
+                            "user": user_id,
+                            "engagement": messageStore[user_id].engagement,
+                            "time_worked": messageStore[user_id].time_worked
+                        },
+                        headers: {
+                            'Authorization': 'basic ' + encoded,
+                            'accept': 'application/json',
+                            'Content-Type': 'application/json'
                         }
-                    }
+                    }, function (err, response, body) {
+                        if (!err && response.statusCode === 200) {
+                            console.log("SUCCESS: " + body.result);
+                            delete messageStore[user_id];
+                            return res.status(200).send(body.result);
+                        } else {
+                            console.log("ERROR: " + JSON.stringify(body));
+                            return res.status(418).send(body);
+                        }
+                    });
                 }
                 if (action === 'no') {
                     console.log("Time not correct");
