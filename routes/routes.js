@@ -205,8 +205,8 @@ var appRouter = function (app) {
                                         delete messageStore[key2];
                                         return res.status(200).send(body.result);
                                     } else {
-                                        console.log("ERROR: " + err);
-                                        return res.status(418).send(err);
+                                        console.log("ERROR: " + body);
+                                        return res.status(418).send(body);
                                     }
                                 });
                             }
