@@ -211,6 +211,7 @@ var appRouter = function (app) {
                         "engagement": messageStore[actionJSON.message_ts].engagement,
                         "hours": messageStore[actionJSON.message_ts].hours
                     };
+                    console.log("Timesheet JSON: " + JSON.stringify(timesheetJSON));
                     request({
                         baseUrl: instanceURL,
                         method: 'POST',
