@@ -234,7 +234,7 @@ var appRouter = function (app) {
                     json: true,
                     body: {
                         "engagement": engagement.toString(),
-                        "user_id": user_id.toString(),
+                        "user": user_id.toString(),
                         "time_worked": callback_id.toString()
                     },
                     headers: {
