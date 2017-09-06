@@ -53,6 +53,93 @@ var appRouter = function (app) {
         }
     });
 
+    app.post('/start', urlencodedParser, function (req, res) {
+        console.log("Req: " + req.body.token);
+        if (req.body.token === verificationToken) {
+            messageStore[req.body.message_ts] = {
+                "start": (new Date().getTime() / 1000),
+                "end": '',
+                "engagement": '',
+                "user": req.body.user.id,
+                "channel": req.body.channel.id,
+                "time_worked": 0
+            };
+            var json = {
+                "text": "You have summoned the Timesheet Wizard!",
+                "attachments": [
+                    {
+                        "text": "Pick your engagement to track time against mortal!",
+                        "fallback": "My magic is failing today...",
+                        "callback_id": "start_work",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default",
+                        "actions": [
+                            {
+                                "name": "engagement_select",
+                                "text": "Choose your engagement!",
+                                "type": "select",
+                                "data_source": "external"
+                            }
+                        ]
+                    }
+                ]
+            };
+            res.contentType('application/json');
+            res.status(200).send(json);
+        } else {
+            res.status(401).send("Token does not match expected");
+        }
+    });
+
+    app.post('/stop', urlencodedParser, function (req, res) {
+        console.log("Req: " + req.body.token);
+        if (req.body.token === verificationToken) {
+            messageStore[req.body.message_ts].end = (new Date().getTime() / 1000);
+            var time_worked = parseFloat((messageStore[req.body.message_ts].end - messageStore[req.body.message_ts].start) / 3600);
+            messageStore[req.body.message_ts].time_worked = time_worked;
+            var additional_time = [{
+                //text: "By my calculations, you have worked " + time_worked + " hours against the current engagement.",
+                fallback: "Cannot Display Buttons",
+                title: "Is this correct?",
+                callback_id: "submit_stopwatch",
+                color: "#3AA3E3",
+                attachment_type: "default",
+                actions: [
+                    {
+                        name: "yes",
+                        text: "Yes",
+                        type: "button",
+                        value: "yes"
+                    },
+                    {
+                        name: "no",
+                        text: "No",
+                        type: "button",
+                        value: "no"
+                    }
+                ]
+
+            }];
+            slack.api('chat.postEphemeral', {
+                //text: body.result.text,
+                channel:  messageStore[req.body.message_ts].channel,
+                user:  messageStore[req.body.message_ts].user,
+                attachments: JSON.stringify(additional_time)
+            }, function (err, response) {
+                console.log("Response: " + JSON.stringify(response));
+                if (!err && response.ok === true) {
+                    console.log("Body: " + response);
+                    res.status(200).send("By my calculations, you have worked " + time_worked + " hours against the current engagement.");
+                } else {
+                    console.log("Failed");
+                    res.status(400).send(err);
+                }
+            });
+        } else {
+            res.status(401).send("Token does not match expected");
+        }
+    });
+
     app.post('/action', urlencodedParser, function (req, res) {
         var json = JSON.stringify(eval("(" + req.body.payload + ")"));
         var actionJSON = JSON.parse(json);
@@ -64,6 +151,38 @@ var appRouter = function (app) {
             var action = actionJSON.actions[0].name;
             var callback_id = actionJSON.callback_id;
 
+            if(callback_id === 'start_work') {
+                messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
+                res.contentType('application/json');
+                res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
+            }
+
+            if (callback_id === 'submit_stopwatch') {
+                request({
+                    baseUrl: instanceURL,
+                    method: 'POST',
+                    uri: apiURI + '/engagement_selected',
+                    json: true,
+                    body: {
+                        "user": messageStore[actionJSON.message_ts].engagement.user,
+                        "engagement": messageStore[actionJSON.message_ts].engagement,
+                        "time_worked": messageStore[actionJSON.message_ts].time_worked
+                    },
+                    headers: {
+                        'Authorization': 'basic ' + encoded,
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }, function (err, response, body) {
+                    if (!err && response.statusCode === 200) {
+                        console.log("SUCCESS: " + body.result);
+                        return res.status(200).send(body.result);
+                    } else {
+                        console.log("ERROR: " + err);
+                        return res.status(418).send(err);
+                    }
+                });
+            }
 
             if (callback_id === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
