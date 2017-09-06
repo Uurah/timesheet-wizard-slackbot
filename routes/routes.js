@@ -180,7 +180,7 @@ var appRouter = function (app) {
             else if (callback_id === 'submit_stopwatch') {
                 if (action === 'yes') {
                     for (var key2 in messageStore) {
-                        if (messageStore.hasOwnProperty(key)) {
+                        if (messageStore.hasOwnProperty(key2)) {
                             console.log("Message Store Key " + key2 + " and user " + messageStore[key2].user);
                             if (messageStore[key2].user.toString() === user_id.toString()) {
                                 console.log("Found Match in Message Store, sending time to SNOW");
