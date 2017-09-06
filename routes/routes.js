@@ -56,12 +56,12 @@ var appRouter = function (app) {
     app.post('/start', urlencodedParser, function (req, res) {
         console.log("Req: " + JSON.stringify(req.body));
         if (req.body.token === verificationToken) {
-            messageStore[req.body.message_ts] = {
+            messageStore[req.body.trigger_id] = {
                 "start": (new Date().getTime() / 1000),
                 "end": '',
                 "engagement": '',
-                "user": req.body.user.id,
-                "channel": req.body.channel.id,
+                "user": req.body.user_id,
+                "channel": req.body.channel_id,
                 "time_worked": 0
             };
             var json = {
