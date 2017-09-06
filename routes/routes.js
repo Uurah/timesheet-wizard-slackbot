@@ -246,7 +246,7 @@ var appRouter = function (app) {
                                 ]
 
                             }];
-                            slack.api('chat.postMessage', {
+                            slack.api('chat.postEphemeral', {
                                 //text: body.result.text,
                                 channel: user_id,
                                 attachments: JSON.stringify(additional_time)
@@ -348,7 +348,7 @@ var appRouter = function (app) {
                     }
                 ]
             }];
-        slack.api('chat.postMessage', {
+        slack.api('chat.postEphemeral', {
             text:'Engagement Summary',
             channel: req.body.user,
             attachments: JSON.stringify(attachments)
