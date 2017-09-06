@@ -248,7 +248,8 @@ var appRouter = function (app) {
                             }];
                             slack.api('chat.postEphemeral', {
                                 //text: body.result.text,
-                                channel: user_id,
+                                channel: 'C40P434P6',
+                                user: user_id,
                                 attachments: JSON.stringify(additional_time)
                             }, function(err, response){
                                 console.log("Response: " + JSON.stringify(response));
@@ -350,7 +351,8 @@ var appRouter = function (app) {
             }];
         slack.api('chat.postEphemeral', {
             text:'Engagement Summary',
-            channel: req.body.user,
+            channel: 'C40P434P6',
+            user: req.body.user,
             attachments: JSON.stringify(attachments)
         }, function(err, response){
             console.log("Response: " + JSON.stringify(response));
