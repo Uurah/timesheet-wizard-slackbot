@@ -15,6 +15,8 @@ var appRouter = function (app) {
     var apiURI = '/api/x_esg_vendition_e/slack';
     var encoded = new Buffer('api:apit3st!').toString('base64');
 
+    var messageStore = {};
+
     app.post('/timesheet', urlencodedParser, function (req, res) {
         console.log("Req: " + req.body.token);
         if (req.body.token === verificationToken) {
@@ -57,20 +59,15 @@ var appRouter = function (app) {
         console.log("Action JSON: " + JSON.stringify(actionJSON));
 
         if (actionJSON.token === verificationToken) {
+
             var user_id = actionJSON.user.id;
             var action = actionJSON.actions[0].name;
             var callback_id = actionJSON.callback_id;
-            var engagement;
 
-            var timesheetJSON = {
-                "user": user_id,
-                "engagement": '',
-                "hours": 0
-            };
 
             if (callback_id === 'engagement_list') {
                 if (actionJSON.actions[0].type === "select") {
-                    engagement = actionJSON.actions[0].selected_options[0].value;
+                    var engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log('Action: ' + action);
                     console.log('User ID: ' + user_id);
                     console.log('Engagement: ' + engagement);
@@ -94,6 +91,7 @@ var appRouter = function (app) {
                 }, function (err, response, body) {
                     if (!err && response.statusCode === 200) {
                         console.log("SUCCESS: " + body);
+                        //messageStore[actionJSON.message_ts].engagement = engagement;
                         return res.status(200).send(body);
                     } else {
                         console.log("ERROR: " + err);
@@ -104,7 +102,7 @@ var appRouter = function (app) {
             if (callback_id === 'enter_time') {
                 if (action === 'yes') {
                     console.log("Wants to enter time");
-                    var json = {
+                    var twjson = {
                         "text": "You have summoned the Timesheet Wizard!",
                         "attachments": [
                             {
@@ -125,7 +123,7 @@ var appRouter = function (app) {
                         ]
                     };
                     res.contentType('application/json');
-                    res.status(200).send(json);
+                    res.status(200).send(twjson);
                 }
                 if (action === 'no') {
                     console.log("Does not want to enter time");
@@ -133,6 +131,8 @@ var appRouter = function (app) {
                 }
             }
             if (callback_id === 'engagement_selected') {
+                messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
+                console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
                 var es = {
                     "text": "",
                     "attachments": [
@@ -190,32 +190,39 @@ var appRouter = function (app) {
                 res.status(200).send(es);
             }
             if (callback_id === 'hours_entered') {
-                timesheetJSON.hours = actionJSON.actions[0].selected_options[0].value;
-                timesheetJSON.engagement = engagement;
-                timesheetJSON.user = user_id;
+                messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
+                console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
 
-                console.log("Timeseet JSON: " + JSON.stringify(timesheetJSON));
-
-                request({
-                    baseUrl: instanceURL,
-                    method: 'POST',
-                    uri: apiURI + '/engagement_selected',
-                    json: true,
-                    body: timesheetJSON,
-                    headers: {
-                        'Authorization': 'basic ' + encoded,
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                }, function (err, response, body) {
-                    if (!err && response.statusCode === 200) {
-                        console.log("SUCCESS: " + body);
-                        return res.status(200).send(body);
-                    } else {
-                        console.log("ERROR: " + err);
-                        return res.status(418).send(err);
-                    }
-                });
+                if (messageStore[actionJSON.message_ts].hasOwnProperty('hours') && messageStore[actionJSON.message_ts].hasOwnProperty('engagement')) {
+                    var timesheetJSON = {
+                        "user": user_id,
+                        "engagement": messageStore[actionJSON.message_ts].engagement,
+                        "hours": messageStore[actionJSON.message_ts].hours
+                    };
+                    request({
+                        baseUrl: instanceURL,
+                        method: 'POST',
+                        uri: apiURI + '/engagement_selected',
+                        json: true,
+                        body: timesheetJSON,
+                        headers: {
+                            'Authorization': 'basic ' + encoded,
+                            'accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    }, function (err, response, body) {
+                        if (!err && response.statusCode === 200) {
+                            console.log("SUCCESS: " + body);
+                            delete messageStore[actionJSON.message_ts];
+                            return res.status(200).send(body);
+                        } else {
+                            console.log("ERROR: " + err);
+                            return res.status(418).send(err);
+                        }
+                    });
+                } else {
+                    console.log("Message Store is missing a parameter needed to send to SNOW");
+                }
             }
             else {
                 console.log("Callback_id does not match any expected");
@@ -309,79 +316,6 @@ var appRouter = function (app) {
                 res.status(400).send(err);
             }
         });
-/*
-        console.log("User: " + req.body.user);
-        console.log("Engagement String: " + req.body.engagements);
-        console.log("Hour String: " + req.body.hours);
-        if (req.body.token === 'xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1') {
-            var json = {
-                "access_token": "xoxp-136089629350-137523975635-226941757556-819bea999b4d0eb7e9afd097e2483205",
-                "bot": {
-                    "bot_user_id":"UTTTTTTTTTTR",
-                    "bot_access_token":"xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1"
-                },
-                "channel": req.body.user,
-                "text": "",
-                "as_user": false,
-                "attachments": [{
-                    "fallback": "This attachment isn't supported.",
-                    "title": "Your Daily Engagement Summary",
-                    "color": "#9c4c0d",
-                    "fields": [{
-                        "title": "Engagement",
-                        "value": req.body.engagements,
-                        "short": true
-                    }, {
-                        "title": "Hours Worked Today",
-                        "value": req.body.hours,
-                        "short": true
-                    }],
-                    "mrkdwn_in": ["text", "fields"],
-                    "text": ""
-                },
-                {
-                    "fallback": "Cannot Display Buttons",
-                    "title": "Would you like to create a timesheet for one of these engagements?",
-                    "callback_id": "enter_time",
-                    "color": "#3AA3E3",
-                    "attachment_type": "default",
-                    "actions": [
-                        {
-                            "name": "yes",
-                            "text": "Yes",
-                            "type": "button",
-                            "value": "yes"
-                        },
-                        {
-                            "name": "no",
-                            "text": "No",
-                            "type": "button",
-                            "value": "no"
-                        }
-                    ]
-                }]
-            };
-            request({
-                baseUrl: 'https://slack.com/api',
-                method: 'POST',
-                uri: '/chat.postMessage',
-                json: true,
-                body: json,
-                headers: {
-                    'Authorization': 'xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1',
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }, function (err, response, body) {
-                if (!err && response.statusCode === 200) {
-                    console.log("SUCCESS: " + body);
-                    return res.status(200).send(body);
-                } else {
-                    console.log("ERROR: " + err);
-                    return res.status(418).send(err);
-                }
-            });
-        }*/
     });
 };
 
