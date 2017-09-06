@@ -223,30 +223,43 @@ var appRouter = function (app) {
                         if (!err && response.statusCode === 200) {
                             console.log("SUCCESS: " + JSON.stringify(body.result));
                             delete messageStore[actionJSON.message_ts];
-                            var additional_time = {
-                                "text": body.result,
-                                "fallback": "Cannot Display Buttons",
-                                "title": "Would you like to time against an additional engagement?",
-                                "callback_id": "enter_time",
-                                "color": "#3AA3E3",
-                                "attachment_type": "default",
-                                "actions": [
+                            var additional_time = [{
+                                text: body.result,
+                                fallback: "Cannot Display Buttons",
+                                title: "Would you like to time against an additional engagement?",
+                                callback_id: "enter_time",
+                                color: "#3AA3E3",
+                                attachment_type: "default",
+                                actions: [
                                     {
-                                        "name": "yes",
-                                        "text": "Yes",
-                                        "type": "button",
-                                        "value": "yes"
+                                        name: "yes",
+                                        text: "Yes",
+                                        type: "button",
+                                        value: "yes"
                                     },
                                     {
-                                        "name": "no",
-                                        "text": "No",
-                                        "type": "button",
-                                        "value": "no"
+                                        name: "no",
+                                        text: "No",
+                                        type: "button",
+                                        value: "no"
                                     }
                                 ]
 
-                            };
-                            return res.status(200).send(additional_time);
+                            }];
+                            slack.api('chat.postMessage', {
+                                text:body.result,
+                                channel: user_id,
+                                attachments: JSON.stringify(additional_time)
+                            }, function(err, response){
+                                console.log("Response: " + JSON.stringify(response));
+                                if (!err && response.ok === true) {
+                                    console.log("Body: " + response);
+                                    res.status(200).send(response);
+                                } else {
+                                    console.log("Failed");
+                                    res.status(400).send(err);
+                                }
+                            });
                         } else {
                             console.log("ERROR: " + err);
                             return res.status(418).send({ "text": "Could not create timesheet."});
