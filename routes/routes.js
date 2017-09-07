@@ -54,8 +54,9 @@ var appRouter = function (app) {
     });
 
     app.post('/start', urlencodedParser, function (req, res) {
-        console.log("Req: " + JSON.stringify(req.body));
-        console.log("User: " + JSON.stringify(req.body.user_id));
+        console.log("START Req: " + JSON.stringify(req.body));
+        console.log("START User: " + JSON.stringify(req.body.user_id));
+        console.log("START Channel: " + JSON.stringify(req.body.channel_id));
         if (req.body.token === verificationToken) {
             messageStore[req.body.user_id] = {
                 "start": (new Date().getTime() / 1000),
@@ -93,7 +94,9 @@ var appRouter = function (app) {
     });
 
     app.post('/stop', urlencodedParser, function (req, res) {
-        console.log("Req: " + JSON.stringify(req.body));
+        console.log("STOP Req: " + JSON.stringify(req.body));
+        console.log("STOP User: " + JSON.stringify(req.body.user_id));
+        console.log("STOP Channel: " + JSON.stringify(req.body.channel_id));
         if (req.body.token === verificationToken) {
             messageStore[req.body.user_id].end = (new Date().getTime() / 1000);
             var time_worked = parseFloat((messageStore[req.body.user_id].end - messageStore[req.body.user_id].start) / 3600).toFixed(2);
