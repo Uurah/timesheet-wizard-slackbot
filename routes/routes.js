@@ -62,7 +62,7 @@ var appRouter = function (app) {
                 "start": (new Date().getTime() / 1000),
                 "end": '',
                 "engagement": '',
-                //"user": req.body.user_id,
+                "user": req.body.user_id,
                 "channel": req.body.channel_id,
                 "time_worked": 0
             };
