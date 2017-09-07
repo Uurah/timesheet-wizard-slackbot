@@ -55,6 +55,7 @@ var appRouter = function (app) {
 
     app.post('/start', urlencodedParser, function (req, res) {
         console.log("Req: " + JSON.stringify(req.body));
+        console.log("User: " + JSON.stringify(req.body.user_id));
         if (req.body.token === verificationToken) {
             messageStore[req.body.user_id] = {
                 "start": (new Date().getTime() / 1000),
@@ -179,7 +180,6 @@ var appRouter = function (app) {
                     }, function (err, response, body) {
                         if (!err && response.statusCode === 200) {
                             console.log("SUCCESS: " + body.result);
-                            delete messageStore[user_id];
                             return res.status(200).send(body.result);
                         } else {
                             console.log("ERROR: " + JSON.stringify(body));
