@@ -20,6 +20,9 @@ var appRouter = function (app) {
     app.post('/timesheet', urlencodedParser, function (req, res) {
         console.log("Req: " + JSON.stringify(req.body));
         if (req.body.token === verificationToken) {
+            messageStore[req.body.user_id] = {
+                "text": req.body.text
+            };
             var json = {
                 "text": "You have summoned the Timesheet Wizard!",
                 "attachments": [
@@ -213,7 +216,7 @@ var appRouter = function (app) {
                     body: {
                         "engagement": engagement.toString(),
                         "user": user_id.toString(),
-                        "time_worked": callback_id.toString()
+                        "time_worked": messageStore[user_id].text
                     },
                     headers: {
                         'Authorization': 'basic ' + encoded,
