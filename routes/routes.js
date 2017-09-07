@@ -18,7 +18,7 @@ var appRouter = function (app) {
     var messageStore = {};
 
     app.post('/timesheet', urlencodedParser, function (req, res) {
-        console.log("Req: " + req.body.token);
+        console.log("Req: " + JSON.stringify(req.body));
         if (req.body.token === verificationToken) {
             var json = {
                 "text": "You have summoned the Timesheet Wizard!",
