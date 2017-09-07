@@ -124,10 +124,11 @@ var appRouter = function (app) {
                     }
                 ]
             }];
+            console.log("STOP Message Vars: Channel: " +  messageStore[req.body.user_id].channel + " User: " + messageStore[req.body.user_id].user);
             slack.api('chat.postEphemeral', {
                 //text: body.result.text,
-                channel:  messageStore[req.body.user_id].channel,
-                user:  messageStore[req.body.user_id].user,
+                channel:  messageStore[req.body.user_id].channel.toString(),
+                user:  messageStore[req.body.user_id].user.toString(),
                 attachments: JSON.stringify(additional_time)
             }, function (err, response) {
                 console.log("Response: " + JSON.stringify(response));
