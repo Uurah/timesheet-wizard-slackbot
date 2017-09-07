@@ -102,7 +102,7 @@ var appRouter = function (app) {
             var time_worked = parseFloat((messageStore[req.body.user_id].end - messageStore[req.body.user_id].start) / 3600).toFixed(2);
             messageStore[req.body.user_id].time_worked = time_worked;
             console.log("Time Worked: " + time_worked);
-            var additional_time = [{
+            var stopwatch_time = [{
                 text: "By my calculations, you have worked " + messageStore[req.body.user_id].time_worked + " hours against the current engagement.",
                 fallback: "Cannot Display Buttons",
                 title: "Is this correct?",
@@ -129,7 +129,7 @@ var appRouter = function (app) {
                 //text: body.result.text,
                 channel:  messageStore[req.body.user_id].channel,
                 user:  messageStore[req.body.user_id].user,
-                attachments: JSON.stringify(additional_time)
+                attachments: JSON.stringify(stopwatch_time)
             }, function (err, response) {
                 console.log("Response: " + JSON.stringify(response));
                 if (!err && response.ok === true) {
@@ -172,9 +172,9 @@ var appRouter = function (app) {
                         uri: apiURI + '/stopwatch',
                         json: true,
                         body: {
-                            "user": user_id,
-                            "engagement": messageStore[user_id].engagement,
-                            "time_worked": messageStore[user_id].time_worked
+                            "user": user_id.toString(),
+                            "engagement": messageStore[user_id].engagement.toString(),
+                            "time_worked": messageStore[user_id].time_worked.toString()
                         },
                         headers: {
                             'Authorization': 'basic ' + encoded,
