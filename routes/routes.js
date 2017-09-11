@@ -1,18 +1,25 @@
-//Require Libraries
-var Slack = require('slack-node');
-var request = require('request');
-var bodyParser = require('body-parser');
-
-var urlencodedParser = bodyParser.urlencoded({extended: false});
-
 var appRouter = function (app) {
+
+    //Require Libraries
+    var Slack = require('slack-node');
+    var request = require('request');
+    var bodyParser = require('body-parser');
+
+    //Set App name based on environment
+    var app_name;
+    if (process.env.ENVIRONMENT === 'development') {
+        app_name = 'quiet-hollows-84294';
+    }
+    else if (process.env.ENVIRONMENT === 'production') {
+        app_name = '';
+    }
+
     //Request to Heroku for ENV VARS
     request({
         baseUrl: 'https://api.heroku.com',
         method: 'GET',
-        uri: '/apps/' + process.env.APP_NAME + '/config-vars',
+        uri: '/apps/' + app_name + '/config-vars',
         json: true,
-        //body: '',
         headers: {
             'Authorization': 'basic ' + process.env.KEY,
             'Accept': 'application/vnd.heroku+json; version=3',
@@ -20,7 +27,7 @@ var appRouter = function (app) {
         }
     }, function (err, response, body) {
         if (!err && response.statusCode === 200) {
-            console.log("SUCCESS: " + JSON.stringify(body));
+            console.log("ENV VARS: " + JSON.stringify(body));
 
             //Env Vars
             var apiToken = process.env.API_TOKEN;
@@ -29,19 +36,18 @@ var appRouter = function (app) {
             var apiURI = process.env.API_URI;
             var encoded = new Buffer(process.env.USER + ":" + process.env.SECRET).toString('base64');
 
-            //console.log("API_TOKEN: " + apiToken);
-            //console.log("VERIFICATION_TOKEN: " + verificationToken);
-            //console.log("INSTANCE_URL: " + instanceURL);
-            //console.log("API_URI: " + apiURI);
-            //console.log("USER: " + process.env.USER);
-            //console.log("SECRET: " + process.env.SECRET);
-
             var slack = new Slack(apiToken);
-
+            var urlencodedParser = bodyParser.urlencoded({extended: false});
             var messageStore = {};
 
+
+            /*
+            *
+            ***API Function Calls***
+            *
+            */
             app.post('/timesheet', urlencodedParser, function (req, res) {
-                console.log("Req: " + JSON.stringify(req.body));
+                console.log("Timesheet Req: " + JSON.stringify(req.body));
                 if (req.body.token === verificationToken) {
                     messageStore[req.body.user_id] = {
                         "text": req.body.text
@@ -75,14 +81,12 @@ var appRouter = function (app) {
                     res.contentType('application/json');
                     return res.status(200).send(json);
                 } else {
-                    return res.status(401).send("Token does not match expected");
+                    return res.status(401).send( { "text": "Token does not match expected"} );
                 }
             });
 
             app.post('/start', urlencodedParser, function (req, res) {
                 console.log("START Req: " + JSON.stringify(req.body));
-                console.log("START User: " + JSON.stringify(req.body.user_id));
-                console.log("START Channel: " + JSON.stringify(req.body.channel_id));
                 if (req.body.token === verificationToken) {
                     messageStore[req.body.user_id] = {
                         "start": (new Date().getTime() / 1000),
@@ -115,19 +119,15 @@ var appRouter = function (app) {
                     res.contentType('application/json');
                     return res.status(200).send(json);
                 } else {
-                    return res.status(401).send("Token does not match expected");
+                    return res.status(401).send( { "text": "Token does not match expected"} );
                 }
             });
 
             app.post('/stop', urlencodedParser, function (req, res) {
                 console.log("STOP Req: " + JSON.stringify(req.body));
-                console.log("STOP User: " + JSON.stringify(req.body.user_id));
-                console.log("STOP Channel: " + JSON.stringify(req.body.channel_id));
                 if (req.body.token === verificationToken) {
                     messageStore[req.body.user_id].end = (new Date().getTime() / 1000);
-                    var time_worked = parseFloat((messageStore[req.body.user_id].end - messageStore[req.body.user_id].start) / 3600).toFixed(2);
-                    messageStore[req.body.user_id].time_worked = time_worked;
-                    console.log("Time Worked: " + time_worked);
+                    messageStore[req.body.user_id].time_worked = parseFloat((messageStore[req.body.user_id].end - messageStore[req.body.user_id].start) / 3600).toFixed(2);
                     var stopwatch_time = [{
                         text: "By my calculations, you have worked " + messageStore[req.body.user_id].time_worked + " hours against the current engagement.",
                         fallback: "Cannot Display Buttons",
@@ -150,9 +150,7 @@ var appRouter = function (app) {
                             }
                         ]
                     }];
-                    console.log("STOP Message Vars: Channel: " + messageStore[req.body.user_id].channel + " User: " + messageStore[req.body.user_id].user);
                     slack.api('chat.postEphemeral', {
-                        //text: body.result.text,
                         channel: messageStore[req.body.user_id].channel,
                         user: messageStore[req.body.user_id].user,
                         attachments: JSON.stringify(stopwatch_time)
@@ -167,7 +165,7 @@ var appRouter = function (app) {
                         }
                     });
                 } else {
-                    return res.status(401).send("Token does not match expected");
+                    return res.status(401).send( { "text": "Token does not match expected"} );
                 }
             });
 
@@ -175,7 +173,6 @@ var appRouter = function (app) {
                 var json = JSON.stringify(eval("(" + req.body.payload + ")"));
                 var actionJSON = JSON.parse(json);
                 console.log("Action JSON: " + JSON.stringify(actionJSON));
-
                 if (actionJSON.token === verificationToken) {
 
                     var user_id = actionJSON.user.id.toString();
@@ -224,14 +221,8 @@ var appRouter = function (app) {
                     }
 
                     else if (callback_id === 'engagement_list') {
-                        console.log("Is NaN: " + isNaN(parseFloat(messageStore[user_id].text)));
                         if (!isNaN(parseFloat(messageStore[user_id].text))) {
                             var engagement = actionJSON.actions[0].selected_options[0].value;
-                            console.log('Action: ' + action);
-                            console.log('User ID: ' + user_id);
-                            console.log('Engagement: ' + engagement);
-                            console.log('Callback ID: ' + callback_id);
-
                             request({
                                 baseUrl: instanceURL,
                                 method: 'POST',
@@ -263,7 +254,6 @@ var appRouter = function (app) {
                     }
                     else if (callback_id === 'enter_time') {
                         if (action === 'yes') {
-                            console.log("Wants to enter time");
                             messageStore[actionJSON.message_ts] = {
                                 "engagement": null,
                                 "hours": null
@@ -299,7 +289,6 @@ var appRouter = function (app) {
                     else if (callback_id === 'engagement_selected') {
                         if (messageStore[actionJSON.message_ts].hasOwnProperty('engagement')) {
                             messageStore[actionJSON.message_ts].engagement = actionJSON.actions[0].selected_options[0].value;
-                            console.log("Engagement: " + messageStore[actionJSON.message_ts].engagement);
                         } else {
                             console.log("Missing engagement property");
                         }
@@ -362,7 +351,6 @@ var appRouter = function (app) {
                     else if (callback_id === 'hours_entered') {
                         if (messageStore[actionJSON.message_ts].hasOwnProperty('hours')) {
                             messageStore[actionJSON.message_ts].hours = actionJSON.actions[0].selected_options[0].value;
-                            console.log("Hours: " + messageStore[actionJSON.message_ts].hours);
                         } else {
                             console.log("Missing hours property");
                         }
@@ -410,7 +398,6 @@ var appRouter = function (app) {
 
                                     }];
                                     slack.api('chat.postEphemeral', {
-                                        //text: body.result.text,
                                         channel: 'C40P434P6',
                                         user: user_id,
                                         attachments: JSON.stringify(additional_time)
@@ -471,10 +458,7 @@ var appRouter = function (app) {
             });
 
             app.post('/timesheet_check', function (req, res) {
-                console.log("Request: " + JSON.stringify(req.body));
-                //var json = JSON.stringify(eval("(" + req.body.payload + ")"));
-                //var actionJSON = JSON.parse(json);
-                //console.log("Action JSON: " + JSON.stringify(actionJSON));
+                console.log("Timesheet Check Request: " + JSON.stringify(req.body));
                 var attachments = [{
                     fallback: "This attachment isn't supported.",
                     title: "Your Daily Engagement Summary",
