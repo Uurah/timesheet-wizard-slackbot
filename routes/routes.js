@@ -19,7 +19,7 @@ var appRouter = function (app) {
         //body: '',
         headers: {
             'Authorization': 'basic ' + new Buffer('nic.mann@esolutionsone.com:BMWrock2!').toString('base64'),
-            'accept': 'application/json',
+            'Accept': 'application/vnd.heroku+json; version=3',
             'Content-Type': 'application/json'
         }
     }, function (err, response, body) {
