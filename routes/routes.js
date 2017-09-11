@@ -235,7 +235,7 @@ var appRouter = function (app) {
                     });
                 } else {
                     console.log("ERROR: text is NaN");
-                    return res.status(418).send({ "text": "Foolish mortal!  You must enter a proper number of hours!" });
+                    return res.status(200).send({ "text": "ERROR!  Foolish mortal!  You must enter a proper number of hours!" });
                 }
             }
             else if (callback_id === 'enter_time') {
