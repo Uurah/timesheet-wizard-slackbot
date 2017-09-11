@@ -1,1 +1,1 @@
-web: INSTANCE_URL=https://esolutionsgroupdemo2.service-now.com node index.js
+web: APP_NAME=quiet-hollows-84294 node index.js

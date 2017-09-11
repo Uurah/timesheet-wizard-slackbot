@@ -11,6 +11,27 @@ var urlencodedParser = bodyParser.urlencoded({extended: false});
 var appRouter = function (app) {
     var request = require('request');
 
+    request({
+        baseUrl: 'https://api.heroku.com',
+        method: 'GET',
+        uri: '/apps/' + process.env.APP_NAME + '/config-vars',
+        json: true,
+        //body: '',
+        headers: {
+            'Authorization': 'basic ' + new Buffer('nic.mann@esolutionsone.com:BMWrock2!').toString('base64'),
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }, function (err, response, body) {
+        if (!err && response.statusCode === 200) {
+            console.log("SUCCESS: " + body);
+            //return res.status(200).send(body);
+        } else {
+            console.log("ERROR: " + JSON.stringify(body));
+            //return res.status(418).send(body.result);
+        }
+    });
+
     var instanceURL = 'https://esolutionsgroupdemo2.service-now.com';
     var apiURI = '/api/x_esg_vendition_e/slack';
     var encoded = new Buffer('api:apit3st!').toString('base64');
