@@ -1,5 +1,5 @@
 var Slack = require('slack-node');
-var webhookUri = "__uri___";
+//var webhookUri = "__uri___";
 var apiToken = "xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1";
 var verificationToken = "x51w2DbNhw3M17KtqDXoe1li";
 var slack = new Slack(apiToken);
