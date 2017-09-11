@@ -13,7 +13,7 @@ var appRouter = function (app) {
         json: true,
         //body: '',
         headers: {
-            'Authorization': 'basic ' + new Buffer('nic.mann@esolutionsone.com:BMWrock2!').toString('base64'),
+            'Authorization': 'basic ' + process.env.KEY,
             'Accept': 'application/vnd.heroku+json; version=3',
             'Content-Type': 'application/json'
         }
@@ -33,7 +33,6 @@ var appRouter = function (app) {
             console.log("API_URI: " + apiURI);
             console.log("USER: " + process.env.USER);
             console.log("SECRET: " + process.env.SECRET);
-            console.log("ENCODED: " + new Buffer('nic.mann@esolutionsone.com:BMWrock2!').toString('base64'));
 
             var slack = new Slack(apiToken);
 
