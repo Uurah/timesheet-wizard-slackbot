@@ -201,37 +201,41 @@ var appRouter = function (app) {
             }
 
             else if (callback_id === 'engagement_list') {
-                if (actionJSON.actions[0].type === "select") {
+                if (!isNaN(parseFloat(messageStore[user_id].text))) {
                     var engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log('Action: ' + action);
                     console.log('User ID: ' + user_id);
                     console.log('Engagement: ' + engagement);
                     console.log('Callback ID: ' + callback_id);
+
+                    request({
+                        baseUrl: instanceURL,
+                        method: 'POST',
+                        uri: apiURI + '/engagement_selected',
+                        json: true,
+                        body: {
+                            "engagement": engagement.toString(),
+                            "user": user_id.toString(),
+                            "time_worked": messageStore[user_id].text
+                        },
+                        headers: {
+                            'Authorization': 'basic ' + encoded,
+                            'accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    }, function (err, response, body) {
+                        if (!err && response.statusCode === 200) {
+                            console.log("SUCCESS: " + body.result);
+                            return res.status(200).send(body.result);
+                        } else {
+                            console.log("ERROR: " + body.result);
+                            return res.status(418).send(body.result);
+                        }
+                    });
+                } else {
+                    console.log("ERROR: text is NaN");
+                    return res.status(418).send({ "text": "Foolish mortal!  You must enter a proper number of hours!" });
                 }
-                request({
-                    baseUrl: instanceURL,
-                    method: 'POST',
-                    uri: apiURI + '/engagement_selected',
-                    json: true,
-                    body: {
-                        "engagement": engagement.toString(),
-                        "user": user_id.toString(),
-                        "time_worked": messageStore[user_id].text
-                    },
-                    headers: {
-                        'Authorization': 'basic ' + encoded,
-                        'accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                }, function (err, response, body) {
-                    if (!err && response.statusCode === 200) {
-                        console.log("SUCCESS: " + body.result);
-                        return res.status(200).send(body.result);
-                    } else {
-                        console.log("ERROR: " + body.result);
-                        return res.status(418).send(body.result);
-                    }
-                });
             }
             else if (callback_id === 'enter_time') {
                 if (action === 'yes') {
@@ -489,7 +493,7 @@ var appRouter = function (app) {
             channel: 'C40P434P6',
             user: req.body.user,
             attachments: JSON.stringify(attachments)
-        }, function(err, response){
+        }, function(err, response, body){
             console.log("Response: " + JSON.stringify(response));
             if (!err && response.ok === true) {
                 console.log("Body: " + response);
