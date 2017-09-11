@@ -24,7 +24,7 @@ var appRouter = function (app) {
             var apiToken = process.env.API_TOKEN;
             var verificationToken = process.env.VERIFICATION_TOKEN;
             var instanceURL = process.env.INSTANCE_URL;
-            var apiURI = process.env.API_URL;
+            var apiURI = process.env.API_URI;
             var encoded = new Buffer(process.env.USER + ":" + process.env.SECRET).toString('base64');
 
             console.log("API_TOKEN: " + apiToken);
@@ -33,15 +33,7 @@ var appRouter = function (app) {
             console.log("API_URI: " + apiURI);
             console.log("USER: " + process.env.USER);
             console.log("SECRET: " + process.env.SECRET);
-
-            //Env Vars
-            /*
-            var apiToken = "xoxb-227973368807-u7m4nEbyDDZWHNZO3s6yady1";
-            var verificationToken = "x51w2DbNhw3M17KtqDXoe1li";
-            var instanceURL = 'https://esolutionsgroupdemo2.service-now.com';
-            var apiURI = '/api/x_esg_vendition_e/slack';
-            var encoded = new Buffer('api:apit3st!').toString('base64');
-            */
+            console.log("ENCODED: " + new Buffer('nic.mann@esolutionsone.com:BMWrock2!').toString('base64'));
 
             var slack = new Slack(apiToken);
 
