@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({extended: false});
 
 var appRouter = function (app) {
+    //Request to Heroku for ENV VARS
     request({
         baseUrl: 'https://api.heroku.com',
         method: 'GET',
@@ -19,7 +20,8 @@ var appRouter = function (app) {
         }
     }, function (err, response, body) {
         if (!err && response.statusCode === 200) {
-            console.log("SUCCESS: " + body);
+            console.log("SUCCESS: " + JSON.stringify(body));
+
             //Env Vars
             var apiToken = process.env.API_TOKEN;
             var verificationToken = process.env.VERIFICATION_TOKEN;
@@ -27,12 +29,12 @@ var appRouter = function (app) {
             var apiURI = process.env.API_URI;
             var encoded = new Buffer(process.env.USER + ":" + process.env.SECRET).toString('base64');
 
-            console.log("API_TOKEN: " + apiToken);
-            console.log("VERIFICATION_TOKEN: " + verificationToken);
-            console.log("INSTANCE_URL: " + instanceURL);
-            console.log("API_URI: " + apiURI);
-            console.log("USER: " + process.env.USER);
-            console.log("SECRET: " + process.env.SECRET);
+            //console.log("API_TOKEN: " + apiToken);
+            //console.log("VERIFICATION_TOKEN: " + verificationToken);
+            //console.log("INSTANCE_URL: " + instanceURL);
+            //console.log("API_URI: " + apiURI);
+            //console.log("USER: " + process.env.USER);
+            //console.log("SECRET: " + process.env.SECRET);
 
             var slack = new Slack(apiToken);
 
