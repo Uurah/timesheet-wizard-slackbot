@@ -201,6 +201,7 @@ var appRouter = function (app) {
             }
 
             else if (callback_id === 'engagement_list') {
+                console.log("Is NaN: " + isNaN(parseFloat(messageStore[user_id].text)));
                 if (!isNaN(parseFloat(messageStore[user_id].text))) {
                     var engagement = actionJSON.actions[0].selected_options[0].value;
                     console.log('Action: ' + action);
