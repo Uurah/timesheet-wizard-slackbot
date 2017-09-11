@@ -50,9 +50,9 @@ var appRouter = function (app) {
                 ]
             };
             res.contentType('application/json');
-            res.status(200).send(json);
+            return res.status(200).send(json);
         } else {
-            res.status(401).send("Token does not match expected");
+            return res.status(401).send("Token does not match expected");
         }
     });
 
@@ -90,9 +90,9 @@ var appRouter = function (app) {
                 ]
             };
             res.contentType('application/json');
-            res.status(200).send(json);
+            return res.status(200).send(json);
         } else {
-            res.status(401).send("Token does not match expected");
+            return res.status(401).send("Token does not match expected");
         }
     });
 
@@ -133,18 +133,18 @@ var appRouter = function (app) {
                 channel:  messageStore[req.body.user_id].channel,
                 user:  messageStore[req.body.user_id].user,
                 attachments: JSON.stringify(stopwatch_time)
-            }, function (err, response) {
+            }, function (err, response, body) {
                 console.log("Response: " + JSON.stringify(response));
                 if (!err && response.ok === true) {
                     console.log("Body: " + response);
-                    res.status(200).send("I have stopped tracking time against this engagement.");
+                    return res.status(200).send("I have stopped tracking time against this engagement.");
                 } else {
-                    console.log("Failed");
-                    res.status(400).send(err);
+                    console.log("ERROR: " + JSON.stringify(body));
+                    return res.status(418).send(body);
                 }
             });
         } else {
-            res.status(401).send("Token does not match expected");
+            return res.status(401).send("Token does not match expected");
         }
     });
 
@@ -164,7 +164,7 @@ var appRouter = function (app) {
             if(callback_id === 'start_work') {
                 messageStore[user_id].engagement = actionJSON.actions[0].selected_options[0].value;
                 res.contentType('application/json');
-                res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
+                return res.status(200).send({ "text": "Fine, I will keep track of this engagement for you.  Type /stop when you are finished working."});
             }
 
             else if (callback_id === 'submit_stopwatch') {
@@ -189,14 +189,14 @@ var appRouter = function (app) {
                             console.log("SUCCESS: " + body.result);
                             return res.status(200).send(body.result);
                         } else {
-                            console.log("ERROR: " + JSON.stringify(body));
-                            return res.status(418).send(body);
+                            console.log("ERROR: " + JSON.stringify(body.result));
+                            return res.status(418).send(body.result);
                         }
                     });
                 }
                 if (action === 'no') {
                     console.log("Time not correct");
-                    res.status(200).send({"text": "Sorry!  I'm a forgetful wizard sometimes.  You'll have to create a timesheet the old fashioned way this time!"});
+                    return res.status(200).send({"text": "Sorry!  I'm a forgetful wizard sometimes.  You'll have to create a timesheet the old fashioned way this time!"});
                 }
             }
 
@@ -228,8 +228,8 @@ var appRouter = function (app) {
                         console.log("SUCCESS: " + body.result);
                         return res.status(200).send(body.result);
                     } else {
-                        console.log("ERROR: " + err);
-                        return res.status(418).send(err);
+                        console.log("ERROR: " + body.result);
+                        return res.status(418).send(body.result);
                     }
                 });
             }
@@ -261,11 +261,11 @@ var appRouter = function (app) {
                         ]
                     };
                     res.contentType('application/json');
-                    res.status(200).send(twjson);
+                    return res.status(200).send(twjson);
                 }
                 if (action === 'no') {
                     console.log("Does not want to enter time");
-                    res.status(200).send({"text": "Then begone with you!"});
+                    return res.status(200).send({"text": "Then begone with you!"});
                 }
             }
             else if (callback_id === 'engagement_selected') {
@@ -329,7 +329,7 @@ var appRouter = function (app) {
                     ]
                 };
                 res.contentType('application/json');
-                res.status(200).send(es);
+                return res.status(200).send(es);
             }
             else if (callback_id === 'hours_entered') {
                 if ( messageStore[actionJSON.message_ts].hasOwnProperty('hours')) {
@@ -386,19 +386,19 @@ var appRouter = function (app) {
                                 channel: 'C40P434P6',
                                 user: user_id,
                                 attachments: JSON.stringify(additional_time)
-                            }, function(err, response){
+                            }, function(err, response, body){
                                 console.log("Response: " + JSON.stringify(response));
                                 if (!err && response.ok === true) {
                                     console.log("Body: " + response);
-                                    res.status(200).send(body.result.text);
+                                    return res.status(200).send(body.result.text);
                                 } else {
-                                    console.log("Failed");
-                                    res.status(400).send(err);
+                                    console.log("Error: " + body);
+                                    return res.status(400).send(body);
                                 }
                             });
                         } else {
-                            console.log("ERROR: " + err);
-                            return res.status(418).send({ "text": "Could not create timesheet."});
+                            console.log("ERROR: " + body.result);
+                            return res.status(418).send(body.result);
                         }
                     });
                 } else {
@@ -435,8 +435,8 @@ var appRouter = function (app) {
                     console.log("SUCCESS: " + body.result);
                     return res.status(200).send(body.result);
                 } else {
-                    console.log("ERROR: " + err);
-                    return res.status(418).send(err);
+                    console.log("ERROR: " + body.result);
+                    return res.status(418).send(body.result);
                 }
             });
         }
@@ -493,10 +493,10 @@ var appRouter = function (app) {
             console.log("Response: " + JSON.stringify(response));
             if (!err && response.ok === true) {
                 console.log("Body: " + response);
-                res.status(200).send(response);
+                return res.status(200).send(response);
             } else {
-                console.log("Failed");
-                res.status(400).send(err);
+                console.log("ERROR: " + body.result);
+                return res.status(418).send(body.result);
             }
         });
     });
