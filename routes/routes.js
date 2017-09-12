@@ -91,10 +91,10 @@ var appRouter = function (app) {
                                 console.log("Response: " + JSON.stringify(response));
                                 if (!err && response.ok === true) {
                                     console.log("SUCCESS: " + response);
-                                    //return res.status(200).send(response);
+                                    return res.status(200).send("SUCCESS");
                                 } else {
                                     console.log("ERROR: " + body.result);
-                                    //return res.status(418).send(body.result);
+                                    return res.status(418).send("FAILURE");
                                 }
                             });
                         } else {
