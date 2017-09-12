@@ -40,13 +40,11 @@ var appRouter = function (app) {
             var urlencodedParser = bodyParser.urlencoded({extended: false});
             var messageStore = {};
 
-
             /*
             *
             ***API Function Calls***
             *
             */
-
             app.post('/weekly_summary', urlencodedParser, function (req, res) {
                 console.log("My Week Req: " + JSON.stringify(req.body));
                 if (req.body.token === verificationToken) {
@@ -83,7 +81,6 @@ var appRouter = function (app) {
                                 mrkdwn_in: ["text", "fields"]
                             }];
                             slack.api('chat.postEphemeral', {
-                                //text: 'Weekly Engagement Summary',
                                 channel: body.result.channel_id,
                                 user: body.result.user,
                                 attachments: JSON.stringify(attachments)
@@ -99,7 +96,7 @@ var appRouter = function (app) {
                             });
                         } else {
                             console.log("ERROR: " + JSON.stringify(body.result));
-                            return res.status(418).send(body.result);
+                            return res.status(418).send(body.result.text);
                         }
                     });
                 } else {
@@ -165,28 +162,37 @@ var appRouter = function (app) {
                         "channel": req.body.channel_id,
                         "time_worked": 0
                     };
-                    var json = {
-                        "text": "You have summoned the Timesheet Wizard!",
-                        "attachments": [
+                    var attachments = [{
+                        text: "Pick your engagement to track time against mortal!",
+                        fallback: "My magic is failing today...",
+                        callback_id: "start_work",
+                        color: "#3AA3E3",
+                        attachment_type: "default",
+                        actions: [
                             {
-                                "text": "Pick your engagement to track time against mortal!",
-                                "fallback": "My magic is failing today...",
-                                "callback_id": "start_work",
-                                "color": "#3AA3E3",
-                                "attachment_type": "default",
-                                "actions": [
-                                    {
-                                        "name": "engagement_select",
-                                        "text": "Choose your engagement!",
-                                        "type": "select",
-                                        "data_source": "external"
-                                    }
-                                ]
+                                name: "engagement_select",
+                                text: "Choose your engagement!",
+                                type: "select",
+                                data_source: "external"
                             }
                         ]
-                    };
-                    res.contentType('application/json');
-                    return res.status(200).send(json);
+
+                    }];
+                    slack.api('chat.postEphemeral', {
+                        text: "You have summoned the Timesheet Wizard!",
+                        channel: req.body.channel_id,
+                        user: req.body.user_id,
+                        attachments: JSON.stringify(attachments)
+                    }, function (err, response, body) {
+                        console.log("Response: " + JSON.stringify(response));
+                        if (!err && response.ok === true) {
+                            console.log("SUCCESS: " + response);
+                            return res.status(200).send();
+                        } else {
+                            console.log("ERROR: " + body.result);
+                            return res.status(418).send({"text": "Oops!  There was a problem!"});
+                        }
+                    });
                 } else {
                     return res.status(401).send({"text": "Token does not match expected"});
                 }
