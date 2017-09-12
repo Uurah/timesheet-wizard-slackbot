@@ -83,7 +83,7 @@ var appRouter = function (app) {
                                 mrkdwn_in: ["text", "fields"]
                             }];
                             slack.api('chat.postEphemeral', {
-                                text: 'Weekly Engagement Summary',
+                                //text: 'Weekly Engagement Summary',
                                 channel: body.result.channel_id,
                                 user: body.result.user,
                                 attachments: JSON.stringify(attachments)
