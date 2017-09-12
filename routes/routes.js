@@ -46,6 +46,56 @@ var appRouter = function (app) {
             ***API Function Calls***
             *
             */
+
+            app.post('/weekly_summary', urlencodedParser, function (req, res) {
+                console.log("My Week Req: " + JSON.stringify(req.body));
+                if (req.body.token === verificationToken) {
+                    request({
+                        baseUrl: instanceURL,
+                        method: 'POST',
+                        uri: apiURI + '/weekly_summary',
+                        json: true,
+                        body: {
+                            "user_id": req.body.user_id.toString()
+                        },
+                        headers: {
+                            'Authorization': 'basic ' + encoded,
+                            'accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    }, function (err, response, body) {
+                        if (!err && response.statusCode === 200) {
+                            console.log("SUCCESS: " + body.result);
+                            var json = {
+                                "text": "",
+                                "attachments": [{
+                                    "fallback": "This attachment isn't supported.",
+                                    "title": "Your Engagement Summary For the Week",
+                                    "color": "#9c4c0d",
+                                    "fields": [{
+                                        "title": "Engagement",
+                                        "value": req.body.engagements,
+                                        "short": true
+                                    }, {
+                                        "title": "Hours Worked This Week",
+                                        "value": req.body.hours,
+                                        "short": true
+                                    }],
+                                    "mrkdwn_in": ["text", "fields"],
+                                    "text": ""
+                                }]
+                            };
+                            return res.status(200).send(json);
+                        } else {
+                            console.log("ERROR: " + JSON.stringify(body.result));
+                            return res.status(418).send(body.result);
+                        }
+                    });
+                } else {
+                    return res.status(401).send( { "text": "Token does not match expected"} );
+                }
+            });
+
             app.post('/timesheet', urlencodedParser, function (req, res) {
                 console.log("Timesheet Req: " + JSON.stringify(req.body));
                 if (req.body.token === verificationToken) {
