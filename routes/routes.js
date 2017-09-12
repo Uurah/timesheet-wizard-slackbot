@@ -94,7 +94,7 @@ var appRouter = function (app) {
                                     return res.status(200).send();
                                 } else {
                                     console.log("ERROR: " + body.result);
-                                    return res.status(418).send( { "text" : "Oops!  There was a problem!"});
+                                    return res.status(418).send({"text": "Oops!  There was a problem!"});
                                 }
                             });
                         } else {
@@ -103,7 +103,7 @@ var appRouter = function (app) {
                         }
                     });
                 } else {
-                    return res.status(401).send( { "text": "Token does not match expected"} );
+                    return res.status(401).send({"text": "Token does not match expected"});
                 }
             });
 
@@ -114,27 +114,26 @@ var appRouter = function (app) {
                         "text": req.body.text
                     };
                     var attachments = [{
-                            text: "Pick your engagement and time worked against it mortal!",
-                            fallback: "My magic is failing today...",
-                            callback_id: "engagement_list",
-                            color: "#3AA3E3",
-                            attachment_type: "default",
-                            actions: [
-                                {
-                                    name: "engagement_select",
-                                    text: "Choose your engagement!",
-                                    type: "select",
-                                    confirm: {
-                                        title: "Timesheet Confirmation",
-                                        text: "Are you sure you want to submit a timesheet against this engagement for " + req.body.text + " hours?",
-                                        ok_text: "Yes",
-                                        dismiss_text: "No"
-                                    },
-                                    data_source: "external"
-                                }
-                            ]
-                        }
-                    ]};
+                        text: "Pick your engagement and time worked against it mortal!",
+                        fallback: "My magic is failing today...",
+                        callback_id: "engagement_list",
+                        color: "#3AA3E3",
+                        attachment_type: "default",
+                        actions: [
+                            {
+                                name: "engagement_select",
+                                text: "Choose your engagement!",
+                                type: "select",
+                                confirm: {
+                                    title: "Timesheet Confirmation",
+                                    text: "Are you sure you want to submit a timesheet against this engagement for " + req.body.text + " hours?",
+                                    ok_text: "Yes",
+                                    dismiss_text: "No"
+                                },
+                                data_source: "external"
+                            }
+                        ]
+                    }];
                     slack.api('chat.postEphemeral', {
                         text: "You have summoned the Timesheet Wizard!",
                         channel: req.body.channel_id,
@@ -147,11 +146,11 @@ var appRouter = function (app) {
                             return res.status(200).send();
                         } else {
                             console.log("ERROR: " + body.result);
-                            return res.status(418).send( { "text" : "Oops!  There was a problem!"});
+                            return res.status(418).send({"text": "Oops!  There was a problem!"});
                         }
                     });
                 } else {
-                    return res.status(401).send( { "text": "Token does not match expected"} );
+                    return res.status(401).send({"text": "Token does not match expected"});
                 }
             });
 
@@ -189,7 +188,7 @@ var appRouter = function (app) {
                     res.contentType('application/json');
                     return res.status(200).send(json);
                 } else {
-                    return res.status(401).send( { "text": "Token does not match expected"} );
+                    return res.status(401).send({"text": "Token does not match expected"});
                 }
             });
 
@@ -235,7 +234,7 @@ var appRouter = function (app) {
                         }
                     });
                 } else {
-                    return res.status(401).send( { "text": "Token does not match expected"} );
+                    return res.status(401).send({"text": "Token does not match expected"});
                 }
             });
 
