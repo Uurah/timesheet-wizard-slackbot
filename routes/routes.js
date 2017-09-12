@@ -66,26 +66,26 @@ var appRouter = function (app) {
                         }
                     }, function (err, response, body) {
                         if (!err && response.statusCode === 200) {
-                            console.log("SUCCESS: " + body.result);
+                            console.log("SUCCESS: " + JSON.stringify(body.result));
                             var attachments = [{
                                 fallback: "This attachment isn't supported.",
                                 title: "Your Engagement Summary For the Week",
                                 color: "#9c4c0d",
                                 fields: [{
                                     title: "Engagement",
-                                    value: req.body.engagements,
+                                    value: body.result.engagements,
                                     short: true
                                 }, {
                                     title: "Hours Worked This Week",
-                                    value: req.body.hours,
+                                    value: body.result.hours,
                                     short: true
                                 }],
                                 mrkdwn_in: ["text", "fields"]
                             }];
                             slack.api('chat.postEphemeral', {
                                 text: 'Weekly Engagement Summary',
-                                channel: req.body.result.channel_id,
-                                user: req.body.result.user,
+                                channel: body.result.result.channel_id,
+                                user: body.result.user,
                                 attachments: JSON.stringify(attachments)
                             }, function (err, response, body) {
                                 console.log("Response: " + JSON.stringify(response));
