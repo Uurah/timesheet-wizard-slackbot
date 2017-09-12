@@ -56,6 +56,7 @@ var appRouter = function (app) {
                         uri: apiURI + '/weekly_summary',
                         json: true,
                         body: {
+                            "channel_id": req.body.channel_id,
                             "user_id": req.body.user_id.toString()
                         },
                         headers: {
@@ -66,26 +67,36 @@ var appRouter = function (app) {
                     }, function (err, response, body) {
                         if (!err && response.statusCode === 200) {
                             console.log("SUCCESS: " + body.result);
-                            var json = {
-                                "text": "",
-                                "attachments": [{
-                                    "fallback": "This attachment isn't supported.",
-                                    "title": "Your Engagement Summary For the Week",
-                                    "color": "#9c4c0d",
-                                    "fields": [{
-                                        "title": "Engagement",
-                                        "value": req.body.engagements,
-                                        "short": true
-                                    }, {
-                                        "title": "Hours Worked This Week",
-                                        "value": req.body.hours,
-                                        "short": true
-                                    }],
-                                    "mrkdwn_in": ["text", "fields"],
-                                    "text": ""
-                                }]
-                            };
-                            return res.status(200).send(json);
+                            var attachments = [{
+                                fallback: "This attachment isn't supported.",
+                                title: "Your Engagement Summary For the Week",
+                                color: "#9c4c0d",
+                                fields: [{
+                                    title: "Engagement",
+                                    value: req.body.engagements,
+                                    short: true
+                                }, {
+                                    title: "Hours Worked This Week",
+                                    value: req.body.hours,
+                                    short: true
+                                }],
+                                mrkdwn_in: ["text", "fields"]
+                            }];
+                            slack.api('chat.postEphemeral', {
+                                text: 'Weekly Engagement Summary',
+                                channel: req.body.result.channel_id,
+                                user: req.body.result.user,
+                                attachments: JSON.stringify(attachments)
+                            }, function (err, response, body) {
+                                console.log("Response: " + JSON.stringify(response));
+                                if (!err && response.ok === true) {
+                                    console.log("SUCCESS: " + response);
+                                    //return res.status(200).send(response);
+                                } else {
+                                    console.log("ERROR: " + body.result);
+                                    //return res.status(418).send(body.result);
+                                }
+                            });
                         } else {
                             console.log("ERROR: " + JSON.stringify(body.result));
                             return res.status(418).send(body.result);
